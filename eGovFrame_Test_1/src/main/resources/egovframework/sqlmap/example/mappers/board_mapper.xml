@@ -104,10 +104,10 @@
 	</update>
 	
 	<!-- 첨부파일 삭제 -->
-	<delete id="deleteFiles" parameterType="int">
+	<!-- <delete id="deleteFiles" parameterType="int">
 		DELETE FROM files
 		WHERE fileno = #{fileNo}	
-	</delete>
+	</delete> -->
 	
 	<!-- 글 삭제 -->
 	<delete id="deletePost" parameterType="int">
@@ -127,5 +127,50 @@
 		SELECT filename
 		FROM files
 		WHERE extendedname = #{extendedName}
+	</select>
+	
+	<!-- 답변글 작성 -->
+	<insert id="insertAnswer" parameterType="answerVO" useGeneratedKeys="true" keyProperty="no">
+		INSERT INTO board_answer (writer,
+								 password,
+								 title,
+								 content,
+								 date,
+								 no
+								 )
+		VALUES (#{writer},
+				#{password},
+				#{title},
+				#{content},
+				now(),
+				#{no}
+				)			 
+	</insert>
+	
+	<!-- 답변 작성 시 게시글 상태변화 -->
+	<update id="updateAnswerStatus" parameterType="int">
+		UPDATE board_write
+		SET isanswered = 1
+		WHERE no = #{no}
+	</update>
+	
+	<!-- 답변글 단건 조회 -->
+	<select id="selectAnswerInfo" parameterType="int" resultType="answerVO" >
+		SELECT answerno, 
+			   password, 
+			   writer,
+			   title, 
+			   content, 
+			   date, 
+			   view,
+			   no
+		FROM board_answer
+		WHERE answerno = #{answerNo}
+	</select>
+	
+	<!-- 답변글 목록 출력 -->
+	<select id="selectAnswer" resultType="answerVO">
+		SELECT * 
+		FROM board_answer
 	</select>
 </mapper>

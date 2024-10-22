@@ -37,4 +37,16 @@ public interface BoardService {
 	
 	// 다운로드 시 원래 이름 선택
 	FileVO selectOriginalName(String exName) throws Exception;
+	
+	// 답변글 작성
+	void insertAnswer(AnswerVO answerVO) throws Exception;
+	
+	// 답변 작성 시 게시글 상태변화
+	void updateAnswerStatus(int no) throws Exception;
+	
+	// 답변글 단건 조회
+	AnswerVO selectAnswerInfo(int answerNo) throws Exception;
+	
+	// 답변글 목록 출력
+	List<AnswerVO> selectAnswer() throws Exception;
 }

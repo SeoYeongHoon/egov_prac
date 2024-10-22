@@ -1,36 +1,20 @@
 package egovframework.example.board.service;
 
-public class BoardVO {
-
-	private int no;
+public class AnswerVO {
+	private int answerNo;
 	private String writer;
 	private String password;
 	private String title;
 	private String content;
 	private String date;
 	private String view;
-	private int isAnswered;
+	private int no;
 	
-	private int pageSize;
-	private int offset;
-	
-	public int getPageSize() {
-		return pageSize;
+	public int getAnswerNo() {
+		return answerNo;
 	}
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
-	}
-	public int getOffset() {
-		return offset;
-	}
-	public void setOffset(int offset) {
-		this.offset = offset;
-	}
-	public int getNo() {
-		return no;
-	}
-	public void setNo(int no) {
-		this.no = no;
+	public void setAnswerNo(int answerNo) {
+		this.answerNo = answerNo;
 	}
 	public String getWriter() {
 		return writer;
@@ -68,17 +52,16 @@ public class BoardVO {
 	public void setView(String view) {
 		this.view = view;
 	}
+	public int getNo() {
+		return no;
+	}
+	public void setNo(int no) {
+		this.no = no;
+	}
 	
 	@Override
 	public String toString() {
-		return "BoardVO [no=" + no + ", writer=" + writer + ", password=" + password + ", title=" + title + ", content="
-				+ content + ", date=" + date + ", view=" + view + ", pageSize=" + pageSize
-				+ ", offset=" + offset + "]";
-	}
-	public int getIsAnswered() {
-		return isAnswered;
-	}
-	public void setIsAnswered(int isAnswered) {
-		this.isAnswered = isAnswered;
+		return "AnswerVO [answerNo=" + answerNo + ", writer=" + writer + ", password=" + password + ", title=" + title
+				+ ", content=" + content + ", date=" + date + ", view=" + view + ", no=" + no + "]";
 	}
 }

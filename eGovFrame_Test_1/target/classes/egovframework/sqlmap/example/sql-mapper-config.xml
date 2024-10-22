@@ -8,6 +8,7 @@
 		<typeAlias alias="fileVO" type="egovframework.example.board.service.FileVO"/>
 		<typeAlias alias="searchVO" type="egovframework.example.board.service.BoardSearchVO"/>
 		<typeAlias alias="pagingVO" type="egovframework.example.board.service.PagingVO"/>
+		<typeAlias alias="answerVO" type="egovframework.example.board.service.AnswerVO"/>
 		<!-- <typeAlias alias="fileVO" type="egovframework.example.board.service.FileVO"/> -->
     </typeAliases>
 </configuration>

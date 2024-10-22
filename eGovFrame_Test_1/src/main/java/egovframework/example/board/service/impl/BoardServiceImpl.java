@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import egovframework.example.board.service.AnswerVO;
 import egovframework.example.board.service.BoardSearchVO;
 import egovframework.example.board.service.BoardService;
 import egovframework.example.board.service.BoardVO;
@@ -92,6 +93,30 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public FileVO selectOriginalName(String exName) throws Exception {
 		return boardMapper.selectOriginalName(exName);
+	}
+
+	// 답변글 작성
+	@Override
+	public void insertAnswer(AnswerVO answerVO) throws Exception {
+		boardMapper.insertAnswer(answerVO);	
+	}
+
+	// 답변 작성 시 게시글 상태변화
+	@Override
+	public void updateAnswerStatus(int no) throws Exception {
+		boardMapper.updateAnswerStatus(no);		
+	}
+
+	// 답변글 단건 조회
+	@Override
+	public AnswerVO selectAnswerInfo(int answerNo) throws Exception {
+		return boardMapper.selectAnswerInfo(answerNo);
+	}
+
+	// 답변글 목록 출력
+	@Override
+	public List<AnswerVO> selectAnswer() throws Exception {
+		return boardMapper.selectAnswer();
 	}
 
 }

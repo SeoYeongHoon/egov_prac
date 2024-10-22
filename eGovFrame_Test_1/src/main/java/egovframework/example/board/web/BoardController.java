@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import egovframework.example.board.service.AnswerVO;
 import egovframework.example.board.service.BoardSearchVO;
 import egovframework.example.board.service.BoardService;
 import egovframework.example.board.service.BoardVO;
@@ -91,11 +92,13 @@ public class BoardController {
 		searchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
 		
 		List<BoardVO> boardList = boardService.selectBoardList(searchVO);
+		List<AnswerVO> answerList = boardService.selectAnswer();
 		
 		searchVO.setSearchKeyword(searchKeyword);
 		searchVO.setSearchCondition(searchCondition);
 		
 		model.addAttribute("boardList", boardList);
+		model.addAttribute("answerList", answerList);
 
 		// 전체 게시물 수 조회
 		int totalCnt = boardService.selectBoardCount(); // 전체 게시글 수 가져오기
@@ -171,34 +174,47 @@ public class BoardController {
 	
 	// 답변 글 작성 기능
 	@RequestMapping(value = "/answerPost.do", method = RequestMethod.POST)
-	public String addAnswerPost(@ModelAttribute("vo") BoardVO vo, @ModelAttribute("fileVO") FileVO fileVO) throws Exception {
+	public String addAnswerPost(@ModelAttribute("answerVO") AnswerVO answerVO,
+							    @ModelAttribute("fileVO") FileVO fileVO,
+							    @RequestParam("no") int no,
+							    @RequestParam("multiFile") List<MultipartFile> multipartFiles
+							    ) throws Exception {
 		
-		// 파일 업로드
-		String fileName = null;
-		String extendedName = null;
-		Long fileSize = null;
-		MultipartFile uploadFile = fileVO.getUploadFile();
+		boardService.insertAnswer(answerVO);
+		boardService.updateAnswerStatus(no);
 		
-		if (!uploadFile.isEmpty()) {
-			String originName = uploadFile.getOriginalFilename(); // 파일명
-			String extensionName = FilenameUtils.getExtension(originName); // 확장자
-			UUID uuid = UUID.randomUUID(); // 고유 식별자
-			fileName = originName; // 첨부파일 파일 이름 표시용
-			extendedName = uuid + "." + extensionName; // 파일 저장용 파일명
-			
-			fileSize = uploadFile.getSize();
-			
-			uploadFile.transferTo(new File("D:\\upload\\" + extendedName)); // 파일 내보내기
-		}
+//		List<Map<String, String>> fileList = new ArrayList<>();
+//		
+//		for (int i = 0; i < multipartFiles.size(); i++) {
+//			String extendedName = null;
+//			Long fileSize = null;
+//			
+//			String originName = multipartFiles.get(i).getOriginalFilename();
+//			String extentionName = FilenameUtils.getExtension(originName);
+//			UUID uuid = UUID.randomUUID();
+//			extendedName = uuid + "." + extentionName;
+//			fileSize = multipartFiles.get(i).getSize();
+//			
+//			extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
+//			// originName = URLEncoder.encode(originName, "UTF-8");
+//			
+//			Map<String, String> map = new HashMap<>();
+//			map.put("originName", originName);
+//			map.put("extendedName", extendedName);
+//			
+//			fileList.add(map);
+//			
+//			fileVO.setFileName(originName);
+//			fileVO.setExtendedName(extendedName);
+//			fileVO.setFileSize(fileSize);
+//			fileVO.setNo(answerVO.getNo());
+//			
+//			boardService.insertFiles(fileVO);
+//			
+//			multipartFiles.get(i).transferTo(new File("D:\\upload\\" + fileList.get(i).get("extendedName")));
+//		
+//		}
 		
-		fileVO.setFileName(fileName);
-		fileVO.setExtendedName(extendedName);
-		fileVO.setFileSize(fileSize);
-		
-		System.out.println(vo.toString());
-		
-		boardService.insertBoard(vo);
-
 		return "redirect:boardList.do";
 	}
 	
@@ -216,6 +232,16 @@ public class BoardController {
 		postView(boardId); // 조회수 증가
 		
 		return "boardInfo";
+	}
+	
+	// 답변글 단건 조회
+	@RequestMapping(value = "/answerInfo.do")
+	public String answerInfo(@RequestParam("selectedAnswerNo") int answerNo, Model model) throws Exception {
+		AnswerVO answerVO = boardService.selectAnswerInfo(answerNo);
+		
+		model.addAttribute("answerInfo", answerVO);
+		
+		return "answerInfo";
 	}
 	
 	// 글 수정 페이지이동
