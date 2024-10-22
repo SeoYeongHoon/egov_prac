@@ -1,0 +1,368 @@
+@charset "UTF-8";
+
+/* boardList */
+#boardContainer {
+	max-width: 1000px;
+	margin: 0 auto;
+}
+
+#searchArea {
+	background-color: lightgray;
+	text-align: center;
+	padding: 15px;
+}
+
+.search-content {
+	background-color: white;
+	padding: 20px;
+	box-shadow: 1px 1px 1px darkgray;
+}
+
+.search-list {
+	list-style: none;
+	padding-right: 30px;
+    border: 1px solid rgb(0, 0, 0, 0.1);
+    border-right: none;
+    border-left: none;
+}
+
+.search-content {
+	display: flex;
+	justify-content: center;
+}
+
+.search-label {
+	width: 120px;
+	padding: 10px;
+	font-weight: bold;
+	background-color: lightgray;
+	margin-bottom: 0;
+}
+
+.search-btn {
+    width: 80px;
+    height: 40px;
+    background-color: gray;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+}
+.search-btn:hover {
+	background-color: dimgray;
+}
+
+.total-posts {
+	margin-top: 30px;
+}
+
+#listArea {
+	border-top: 1px solid black;
+}
+
+.info-select {
+	cursor: pointer;
+}
+.info-select:hover {
+	background-color: lightgray;
+}
+
+.post-btn-container {
+	position: relative;
+	height: 100px;
+}
+.post-btn {
+	position: absolute;
+	right: 0;
+	width: 80px;
+    height: 40px;
+    background-color: white;
+    border: 1px solid lightgray;
+    font-weight: bold;
+    border-radius: 5px;
+}
+.post-btn:hover {
+	background-color: lightgray;
+}
+
+
+/* boardInfo */
+#boardInfo {
+	max-width: 1000px;
+	margin: 50px auto;
+}
+.post-title {
+	color: dodgerblue;
+}
+.post-info-container {
+	border-bottom: 2px solid lightgray;
+	padding-bottom: 15px;
+}
+.post-info {
+	padding: 0 20px;
+	border-right: 1px solid lightgray;
+}
+.post-info:nth-child(1) {
+	padding-left: 0;
+}
+.post-info:nth-child(3) {
+	border-right: 0;
+}
+
+.post-content-container {
+	min-height: 300px;
+}
+.post-content {
+	margin: 15px 0;
+}
+
+.post-file-container {
+	margin: 20px 0;
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    padding: 15px 0;
+}
+
+.post-file {
+	margin-right: 15px;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.to-list-btn {
+	position: absolute;
+	left: 0;
+	width: 80px;
+    height: 40px;
+    background-color: gray;
+    border: 1px solid gray;
+    font-weight: bold;
+    border-radius: 2px;
+    cursor: pointer;
+    color: white;
+}
+.to-list-btn:hover {
+	background-color: lightgray;
+    border: 1px solid lightgray;
+}
+
+.option-btns {
+	position: absolute;
+	right: 0;
+	display: flex;
+    align-items: center;
+}
+
+.to-update-btn {
+	width: 80px;
+    height: 40px;
+    background-color: blue;
+    border: 1px solid blue;
+    font-weight: bold;
+    color: white;
+    border-radius: 2px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+.to-update-btn:hover {
+    background-color: dodgerblue;
+    border: 1px solid dodgerblue;
+}
+
+.to-delete-btn {
+	width: 80px;
+    height: 40px;
+    background-color: red;
+    border: 1px solid red;
+    font-weight: bold;
+    color: white;
+    border-radius: 2px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+.to-delete-btn:hover {
+    background-color: indianred;
+    border: 1px solid indianred;
+}
+
+.to-answer-btn {
+	width: 80px;
+    height: 40px;
+    background-color: mediumseagreen;
+    border: 1px solid mediumseagreen;
+    font-weight: bold;
+    color: white;
+    border-radius: 2px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+.to-answer-btn:hover {
+    background-color: lightseagreen;
+    border: 1px solid lightseagreen;
+}
+
+
+/* boardPost */
+#boardAdd {
+	max-width: 1000px;
+	margin: 50px auto;
+	position: relative;
+}
+
+.writer-area {
+	display: flex;
+	text-align: center;
+	position: relative;
+	align-items: center;
+	padding-bottom: 20px;
+	border-bottom: 1px solid lightgray;
+}
+.writer-content {
+	display: flex;
+	align-items: center;
+}
+.password-content {
+	display: flex;
+	position: absolute;
+	right: 0;
+	align-items: center;
+}
+.info-input {
+	width: 250px;
+	height: 30px;
+    border: 1px solid lightgray;
+}
+
+.post-area-label {
+	width: 200px;
+}
+
+.title-area {
+	height: 50px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+	margin-bottom: 20px;
+    margin-top: 12px;
+    padding-bottom: 12px;
+	border-bottom: 1px solid lightgray;
+}
+.title-input {
+	width: 100%;
+	height: 30px;
+	border: 1px solid lightgray;
+}
+
+.content-area {
+    height: 400px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+	margin: 5px 0;
+    padding: 5px 0 25px 0;
+	border-bottom: 1px solid lightgray;
+}
+
+.content-input {
+    width: 100%;
+    min-height: 400px;
+    border: 1px solid lightgray;
+    padding: 5px;
+    resize: none;
+}
+
+.file-area {
+	display: flex;
+    text-align: center;
+    height: 50px;
+    align-items: center;
+    padding-bottom: 4px;
+    padding-top: 4px;
+}
+
+.upload-name {
+	width: 50%;
+    height: 30px;
+    padding-left: 5px;
+    border: 1px solid lightgray;
+}
+.upload-btn {
+    border: 1px solid black;
+    cursor: pointer;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.file-area input[type="file"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+}
+
+#file-add-list {
+	display: none;
+	margin-left: 165px;
+	margin-top: 0;
+}
+
+#fileRemoveBtn {
+	display: inline-flex;
+	margin-right: 20px;
+	margin-bottom: 5px;
+}
+
+.remove-btn {
+	width: 20px;
+}
+
+.save-btn-area {
+	text-align: end;
+	padding-top: 10px;
+	margin-top: 5px;
+	border-top: 1px solid lightgray;
+}
+
+.post-save-btn {
+	width: 80px;
+    height: 40px;
+    background-color: blue;
+    border: 1px solid blue;
+    font-weight: bold;
+    color: white;
+    border-radius: 2px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+.post-save-btn:hover {
+	background-color: dodgerblue;
+    border: 1px solid dodgerblue;
+}
+
+.post-cancel-btn {
+	width: 80px;
+    height: 40px;
+    background-color: gray;
+    border: 1px solid gray;
+    font-weight: bold;
+    color: white;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.post-cancel-btn:hover {
+	background-color: lightgray;
+    border: 1px solid lightgray;
+}
+
+
+
+/* boardUpdate */
+#boardUpdate {
+	max-width: 1000px;
+	margin: 50px auto;
+	position: relative;
+}

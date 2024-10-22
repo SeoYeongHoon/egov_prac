@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.example.board.service.impl.BoardMapper">
+	<!-- <resultMap type="boardVO" id="boardListResult">
+		<result property="boardId" column="board_id" />
+		<result property="writer" column="writer" />
+		<result property="title" column="title" />
+		<result property="content" column="content" />
+	</resultMap> -->
+
+	<!-- 글 목록 -->
+	<select id="selectBoardList" parameterType="searchVO" resultType="boardVO">
+		SELECT *
+		FROM board_write
+		WHERE 1=1
+		<if test="searchKeyword != null and searchKeyword != ''">
+			<choose>
+				<when test="searchCondition == 1">
+					AND writer LIKE Concat('%' , #{searchKeyword} , '%')
+				</when>
+				<when test="searchCondition == 0">
+					AND title LIKE Concat('%' , #{searchKeyword} , '%')
+				</when>
+			</choose>
+		</if>
+		ORDER BY no DESC
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+	
+	<!-- 글 개수 -->
+	<select id="selectBoardCount" resultType="int">
+		SELECT COUNT(*) cnt
+		FROM board_write
+	</select>
+	
+	<!-- 글 단건 조회 -->
+	<select id="selectBoardInfo" parameterType="int" resultType="boardVO">
+		SELECT no, 
+			   password, 
+			   writer,
+			   title, 
+			   content, 
+			   date, 
+			   view
+		FROM board_write
+		WHERE no = #{no}
+	</select>
+	<!-- 글 첨부파일 조회 -->
+	<select id="selectFilesInfo" parameterType="int" resultType="fileVO">
+		SELECT f.fileNo,
+			   f.filename,
+			   f.extendedname,
+			   f.filesize,
+			   b.no
+		FROM files f JOIN board_write b ON f.no = b.no
+		WHERE b.no = #{no}
+	</select>
+	
+	<!-- 글 작성 -->
+	<insert id="insertBoard" parameterType="boardVO" useGeneratedKeys="true" keyProperty="no">
+		INSERT INTO board_write (writer,
+								 password,
+								 title,
+								 content,
+								 date
+								 )
+		VALUES (#{writer},
+				#{password},
+				#{title},
+				#{content},
+				now()
+				)				 
+	</insert>
+	
+	
+	<!-- 첨부파일 업로드 -->
+	<insert id="insertFiles" parameterType="fileVO">
+		INSERT INTO files (filename,
+						   extendedname,
+						   filesize,
+						   no)
+		VALUES (#{fileName},
+			    #{extendedName},
+			    #{fileSize},
+			    #{no}
+		)						   
+	</insert>
+	
+	<!-- 글 수정 -->
+	<update id="updateBoard">
+		UPDATE board_write
+		SET title = #{title},
+		    content = #{content}
+		WHERE no = #{no}
+	</update>
+	
+	<!-- 첨부파일 수정 -->
+	<update id="updateFiles" parameterType="int">
+		UPDATE files
+		SET filename = #{fileName},
+			extendedname = #{extendedName},
+			filesize = #{fileSize}
+		WHERE no = #{no}
+	</update>
+	
+	<!-- 첨부파일 삭제 -->
+	<delete id="deleteFiles" parameterType="int">
+		DELETE FROM files
+		WHERE fileno = #{fileNo}	
+	</delete>
+	
+	<!-- 글 삭제 -->
+	<delete id="deletePost" parameterType="int">
+		DELETE FROM board_write
+		WHERE no = #{no}
+	</delete>
+	
+	<!-- 조회수 증가 -->
+	<update id="updateView">
+		UPDATE board_write
+		SET view = view + 1
+		WHERE no = #{no}
+	</update>
+	
+	<!-- 다운로드 시 원래 이름 선택 -->
+	<select id="selectOriginalName" parameterType="fileVO" resultType="fileVO">
+		SELECT filename
+		FROM files
+		WHERE extendedname = #{extendedName}
+	</select>
+</mapper>
