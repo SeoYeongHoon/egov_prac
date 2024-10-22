@@ -1,120 +1,78 @@
 package egovframework.example.board.service;
 
-import java.io.Serializable;
+public class BoardSearchVO {
 
-public class BoardSearchVO implements Serializable {
+    private String searchKeyword;    // 검색어
+    private String searchCondition;  // 검색 조건 (제목/작성자)
+    private int pageIndex = 1;       // 현재 페이지 번호
+    private int pageUnit;            // 한 페이지에 보여줄 게시물 수
+    private int pageSize;            // 페이지 네비게이션에 표시할 페이지 수
+    private int firstIndex;          // 첫 게시물 인덱스
+    private int lastIndex;           // 마지막 게시물 인덱스
+    private int recordCountPerPage;  // 한 페이지에 표시할 게시물 수
 
-	private static final long serialVersionUID = -858838578081269359L;
-	
-	/** 검색조건 */
-	private String searchCondition = "";
+    public String getSearchKeyword() {
+        return searchKeyword;
+    }
 
-	/** 검색Keyword */
-	private String searchKeyword = "";
+    public void setSearchKeyword(String searchKeyword) {
+        this.searchKeyword = searchKeyword;
+    }
 
-	/** 검색사용여부 */
-	private String searchUseYn = "";
+    public String getSearchCondition() {
+        return searchCondition;
+    }
 
-	/** 현재페이지 */
-	private int pageIndex = 1;
+    public void setSearchCondition(String searchCondition) {
+        this.searchCondition = searchCondition;
+    }
 
-	/** 페이지갯수 */
-	private int pageUnit = 10;
+    public int getPageIndex() {
+        return pageIndex;
+    }
 
-	/** 페이지사이즈 */
-	private int pageSize = 10;
+    public void setPageIndex(int pageIndex) {
+        this.pageIndex = pageIndex;
+    }
 
-	/** firstIndex */
-	private int firstIndex = 1;
+    public int getPageUnit() {
+        return pageUnit;
+    }
 
-	/** lastIndex */
-	private int lastIndex = 1;
+    public void setPageUnit(int pageUnit) {
+        this.pageUnit = pageUnit;
+    }
 
-	/** recordCountPerPage */
-	private int recordCountPerPage = 10;
+    public int getPageSize() {
+        return pageSize;
+    }
 
-	public String getSearchCondition() {
-		return searchCondition;
-	}
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
 
-	public void setSearchCondition(String searchCondition) {
-		this.searchCondition = searchCondition;
-	}
+    public int getFirstIndex() {
+        return firstIndex;
+    }
 
-	public String getSearchKeyword() {
-		return searchKeyword;
-	}
+    public void setFirstIndex(int firstIndex) {
+        this.firstIndex = firstIndex;
+    }
 
-	public void setSearchKeyword(String searchKeyword) {
-		this.searchKeyword = searchKeyword;
-	}
+    public int getLastIndex() {
+        return lastIndex;
+    }
 
-	public String getSearchUseYn() {
-		return searchUseYn;
-	}
+    public void setLastIndex(int lastIndex) {
+        this.lastIndex = lastIndex;
+    }
 
-	public void setSearchUseYn(String searchUseYn) {
-		this.searchUseYn = searchUseYn;
-	}
+    public int getRecordCountPerPage() {
+        return recordCountPerPage;
+    }
 
-	public int getPageIndex() {
-		return pageIndex;
-	}
-
-	public void setPageIndex(int pageIndex) {
-		this.pageIndex = pageIndex;
-	}
-
-	public int getPageUnit() {
-		return pageUnit;
-	}
-
-	public void setPageUnit(int pageUnit) {
-		this.pageUnit = pageUnit;
-	}
-
-	public int getPageSize() {
-		return pageSize;
-	}
-
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
-	}
-
-	public int getFirstIndex() {
-		return firstIndex;
-	}
-
-	public void setFirstIndex(int firstIndex) {
-		this.firstIndex = firstIndex;
-	}
-
-	public int getLastIndex() {
-		return lastIndex;
-	}
-
-	public void setLastIndex(int lastIndex) {
-		this.lastIndex = lastIndex;
-	}
-
-	public int getRecordCountPerPage() {
-		return recordCountPerPage;
-	}
-
-	public void setRecordCountPerPage(int recordCountPerPage) {
-		this.recordCountPerPage = recordCountPerPage;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
-	@Override
-	public String toString() {
-		return "BoardSearchVO [searchCondition=" + searchCondition + ", searchKeyword=" + searchKeyword
-				+ ", searchUseYn=" + searchUseYn + ", pageIndex=" + pageIndex + ", pageUnit=" + pageUnit + ", pageSize="
-				+ pageSize + ", firstIndex=" + firstIndex + ", lastIndex=" + lastIndex + ", recordCountPerPage="
-				+ recordCountPerPage + "]";
-	}
-	
+    public void setRecordCountPerPage(int recordCountPerPage) {
+        this.recordCountPerPage = recordCountPerPage;
+    }
 }
+

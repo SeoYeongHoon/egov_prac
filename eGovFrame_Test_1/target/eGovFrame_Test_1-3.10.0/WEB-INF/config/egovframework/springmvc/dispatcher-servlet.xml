@@ -46,7 +46,7 @@
 
     <bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" p:order="1"
 	    p:viewClass="org.springframework.web.servlet.view.JstlView"
-	    p:prefix="/WEB-INF/jsp/egovframework/example/" p:suffix=".jsp"/>
+	    p:prefix="/WEB-INF/jsp/" p:suffix=".jsp"/>
 
     <!-- For Pagination Tag -->
     <bean id="imageRenderer" class="egovframework.example.cmmn.web.EgovImgPaginationRenderer"/>
@@ -59,6 +59,12 @@
         </property>
     </bean>
 	<!-- /For Pagination Tag -->
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="100000000" />
+		<property name="maxInMemorySize" value="100000000" />
+	</bean>
 
     <mvc:view-controller path="/cmmn/validator.do" view-name="cmmn/validator"/>
+    
 </beans>

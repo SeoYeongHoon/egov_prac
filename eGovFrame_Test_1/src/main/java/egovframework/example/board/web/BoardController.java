@@ -46,67 +46,47 @@ public class BoardController {
 	// 글 목록(첫 페이지)
 	@RequestMapping(value = "/boardList.do")
 	public String boardList(
-							ModelMap model,
-							@RequestParam(value = "pageNo", defaultValue = "1") String pageNo,
-							@ModelAttribute("searchVO") BoardSearchVO searchVO,
-							@RequestParam(required = false, defaultValue = "1") String searchCondition,
-							@RequestParam(required = false) String searchKeyword
-							) throws Exception {
-		
-		/*
-			SELECT *
-			FROM board_write
-			ORDER BY no DESC
-			LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
-			
-			SELECT *
-			FROM board_write
-			ORDER BY no DESC
-			LIMIT 10 OFFSET 0;
-			=> 첫 페이지
-			
-			SELECT *
-			FROM board_write
-			ORDER BY no DESC
-			LIMIT 10 OFFSET 10;
-			=> 두 번째 페이지
-			.
-			.
-			.
-			
-		*/
-		
-		System.out.println("페이지: \t" + pageNo);
-		
-		searchVO.setPageUnit(propertiesService.getInt("pageUnit"));
-		searchVO.setPageSize(propertiesService.getInt("pageSize"));
-		
-		// 페이징 설정
-		PaginationInfo paginationInfo = new PaginationInfo();
-		paginationInfo.setCurrentPageNo(searchVO.getPageIndex()); // 현재 페이지 번호
-		paginationInfo.setRecordCountPerPage(searchVO.getPageUnit()); // 한 페이지에 있는 게시글 수
-		paginationInfo.setPageSize(searchVO.getPageSize()); // 페이징 네비게이션에 나타날 페이지 수
-		
-		searchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
-		searchVO.setLastIndex(paginationInfo.getLastRecordIndex());
-		searchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
-		
-		List<BoardVO> boardList = boardService.selectBoardList(searchVO);
-		List<AnswerVO> answerList = boardService.selectAnswer();
-		
-		searchVO.setSearchKeyword(searchKeyword);
-		searchVO.setSearchCondition(searchCondition);
-		
-		model.addAttribute("boardList", boardList);
-		model.addAttribute("answerList", answerList);
+	                        ModelMap model,
+	                        @RequestParam(value = "pageNo", defaultValue = "1") String pageNo,
+	                        @ModelAttribute("searchVO") BoardSearchVO searchVO,
+	                        @RequestParam(required = false, defaultValue = "1") String searchCondition,
+	                        @RequestParam(required = false) String searchKeyword
+	                        ) throws Exception {
 
-		// 전체 게시물 수 조회
-		int totalCnt = boardService.selectBoardCount(); // 전체 게시글 수 가져오기
-		paginationInfo.setTotalRecordCount(totalCnt); // 전체 게시글 수 설정
-		model.addAttribute("paginationInfo", paginationInfo);
-		
-		return "boardList";
+	    // 페이지 번호와 검색 조건 설정
+	    int pageIndex = Integer.parseInt(pageNo);
+	    searchVO.setSearchKeyword(searchKeyword);
+	    searchVO.setSearchCondition(searchCondition);
+	    
+	    searchVO.setPageIndex(pageIndex); // 페이지 인덱스 설정
+	    searchVO.setPageUnit(propertiesService.getInt("pageUnit"));
+	    searchVO.setPageSize(propertiesService.getInt("pageSize"));
+
+	    // 페이징 설정
+	    PaginationInfo paginationInfo = new PaginationInfo();
+	    paginationInfo.setCurrentPageNo(searchVO.getPageIndex()); // 현재 페이지 번호
+	    paginationInfo.setRecordCountPerPage(searchVO.getPageUnit()); // 한 페이지에 있는 게시글 수
+	    paginationInfo.setPageSize(searchVO.getPageSize()); // 페이징 네비게이션에 나타날 페이지 수
+
+	    searchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
+	    searchVO.setLastIndex(paginationInfo.getLastRecordIndex());
+	    searchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
+	    // 게시글 목록 조회
+	    List<BoardVO> boardList = boardService.selectBoardList(searchVO);
+	    List<AnswerVO> answerList = boardService.selectAnswer();
+	    
+	    // 전체 게시글 수 조회
+	    int totalCnt = boardService.selectBoardCount(searchVO);
+	    paginationInfo.setTotalRecordCount(totalCnt); // 전체 게시글 수 설정
+	    model.addAttribute("paginationInfo", paginationInfo);
+	    
+	    model.addAttribute("boardList", boardList);
+	    model.addAttribute("answerList", answerList);
+
+	    return "boardList";
 	}
+
 	
 	// 글 쓰기 페이지이동
 	@RequestMapping(value = "/boardPost.do")

@@ -16,7 +16,7 @@ public interface BoardMapper {
 	List<BoardVO> selectBoardList(BoardSearchVO searchVO) throws Exception;
 	
 	// 글 개수
-	int selectBoardCount() throws Exception;
+	int selectBoardCount(BoardSearchVO boardSearchVO) throws Exception;
 	
 	// 글 단건 조회
 	BoardVO selectBoardInfo(int no) throws Exception;

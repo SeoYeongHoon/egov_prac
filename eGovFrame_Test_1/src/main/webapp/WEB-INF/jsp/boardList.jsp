@@ -149,114 +149,76 @@ crossorigin="anonymous">
 		
 		<!-- 목록 구역 -->
 		<form id="boardListForm" name="boardListForm" method="POST">
-			<input type="hidden" name="selectedBoardId" />
-			<input type="hidden" name="selectedAnswerNo" />	
-			<div id="listArea">
-				<table class="table table-bordered">
-					<thead class="thead-light" style="text-align: center;">
-			   			<tr> 
-			   				<th>순번</th>
-			   				<th>제목</th>
-			   				<th>작성자</th>
-			   				<th>등록일</th>
-			   				<th>조회수</th>
-			   			</tr>
-					</thead>
-					<tbody id="listBodyArea">
-					<c:forEach var="list" items="${boardList}" varStatus="status">
-		       			<tr>
-		       				<%-- <td><c:out value="${list.no }" /></td>
-		       				<td style="text-align: center;">${fn:length(boardList) - status.index}</td> --%>
-		       				
-	            			<td style="text-align: center;"><c:out value="${paginationInfo.totalRecordCount+1 - ((searchVO.pageIndex-1) * searchVO.pageSize + status.count)}"/></td>
-		       				<td class="info-select" onClick="selectBoardInfo('<c:out value="${list.no }" />')"><c:out value="${list.title }" /></td>
-		       				<td style="text-align: center;"><c:out value="${list.writer }" /></td>
-		       				<td style="text-align: center;"><c:out value="${list.date }" /></td>
-		       				<td style="text-align: center;"><c:out value="${list.view }" /></td>
-		       			</tr>
-		       			
-		       			<c:set var="isAnswered" value="${list.isAnswered }" />
-		       				<c:forEach var="answer" items="${answerList }" varStatus="status">
-				       			<c:if test="${isAnswered eq 1 and list.no eq answer.no}">
-				       			<tr style="background-color: aliceblue;">
-			            			<%-- <td style="text-align: center;"><c:out value="${answer.no }" /></td> --%>
-			            			<td style="text-align: center">[답변]</td>
-				       				<td class="info-select" onClick="selectAnswerInfo('<c:out value="${answer.answerNo }" />')"> ㄴ <c:out value="${answer.title }" /></td>
-				       				<td style="text-align: center;"><c:out value="${answer.writer }" /></td>
-				       				<td style="text-align: center;"><c:out value="${answer.date }" /></td>
-				       				<td style="text-align: center;"><c:out value="${answer.view }" /></td>
-				       			</tr>
-				       			</c:if>
-				   			</c:forEach>
-		   			</c:forEach>
-					</tbody>
-		   		</table>
-			</div>
-			
-			<%-- <div>
-				<table class="table table-bordered">
-					<thead class="thead-light" style="text-align: center;">
-			   			<tr> 
-			   				<th>순번</th>
-			   				<th>제목</th>
-			   				<th>작성자</th>
-			   				<th>등록일</th>
-			   				<th>조회수</th>
-			   			</tr>
-					</thead>
-					<tbody id="listBodyArea">
-					<c:forEach var="list" items="${answerList }" varStatus="status">
-		       			<tr>
-	            			<td style="text-align: center;"><c:out value="${list.no }" /></td>
-		       				<td class="info-select" onClick="selectBoardInfo('<c:out value="${list.no }" />')"><c:out value="${list.title }" /></td>
-		       				<td style="text-align: center;"><c:out value="${list.writer }" /></td>
-		       				<td style="text-align: center;"><c:out value="${list.date }" /></td>
-		       				<td style="text-align: center;"><c:out value="${list.view }" /></td>
-		       			</tr>
-		   			</c:forEach>
-					</tbody>
-		   		</table>
-			</div> --%>
-			
-			
-	      	<%-- <div id="pagination" style="text-align: center;">		
-				<c:if test="${paging.startPage != 1 }">
-					<a href="/boardList?nowPage=${paging.startPage - 1 }&cntPerPage=${paging.cntPerPage}">&lt;</a>
-				</c:if>
-				<c:forEach begin="${paging.startPage }" end="${paging.endPage }" var="p">
-					<c:choose>
-						<c:when test="${p == paging.nowPage }">
-							<b>${p }</b>
-						</c:when>
-						<c:when test="${p != paging.nowPage }">
-							<a href="/boardList?nowPage=${p }&cntPerPage=${paging.cntPerPage}">${p }</a>
-						</c:when>
-					</c:choose>
-				</c:forEach>
-				<c:if test="${paging.endPage != paging.lastPage}">
-					<a href="/boardList?nowPage=${paging.endPage+1 }&cntPerPage=${paging.cntPerPage}">&gt;</a>
-				</c:if>
-			</div> --%>
+		    <input type="hidden" name="selectedBoardId" />
+		    <input type="hidden" name="selectedAnswerNo" />
+		    <div id="listArea">
+		        <table class="table table-bordered">
+		            <thead class="thead-light" style="text-align: center;">
+		                <tr>
+		                    <th>순번</th>
+		                    <th>제목</th>
+		                    <th>작성자</th>
+		                    <th>등록일</th>
+		                    <th>조회수</th>
+		                </tr>
+		            </thead>
+		            <tbody id="listBodyArea">
+		                <c:forEach var="list" items="${boardList}" varStatus="status">
+		                    <tr>
+		                        <td style="text-align: center;">
+		                            <c:out value="${paginationInfo.totalRecordCount+1 - ((searchVO.pageIndex-1) * searchVO.pageSize + status.count)}"/>
+		                        </td>
+		                        <td class="info-select" onClick="selectBoardInfo('<c:out value="${list.no }" />')">
+		                            <c:out value="${list.title }"/>
+		                        </td>
+		                        <td style="text-align: center;"><c:out value="${list.writer }"/></td>
+		                        <td style="text-align: center;"><c:out value="${list.date }"/></td>
+		                        <td style="text-align: center;"><c:out value="${list.view }"/></td>
+		                    </tr>
+		                    
+		                    <c:set var="isAnswered" value="${list.isAnswered }" />
+		                    <c:forEach var="answer" items="${answerList }" varStatus="status">
+		                        <c:if test="${isAnswered eq 1 and list.no eq answer.no}">
+		                            <tr style="background-color: aliceblue;">
+		                                <td style="text-align: center">[답변]</td>
+		                                <td class="info-select" onClick="selectAnswerInfo('<c:out value="${answer.answerNo }" />')">
+		                                    ㄴ <c:out value="${answer.title }"/>
+		                                </td>
+		                                <td style="text-align: center;"><c:out value="${answer.writer }"/></td>
+		                                <td style="text-align: center;"><c:out value="${answer.date }"/></td>
+		                                <td style="text-align: center;"><c:out value="${answer.view }"/></td>
+		                            </tr>
+		                        </c:if>
+		                    </c:forEach>
+		                </c:forEach>
+		            </tbody>
+		        </table>
+		    </div>
 		</form>
 		
 		<!-- 페이징 -->
-		<!-- <div class="pagination" id="paginationArea">
-			js로 데이터 삽입
-		</div> -->
-		<%-- <div id="paging">
-      		<ui:pagination paginationInfo = "${paginationInfo}" type="image" jsFunction="fn_egov_link_page" />
-      		<form:hidden path="pageIndex" />
-      	</div> --%>
-      	
-      	<div>
-      		<span>${paginationInfo.currentPageNo }</span>
-      		<a href="javascript:pagination(2)">2</a>
-      		<span>${paginationInfo.totalPageCount }</span>
-		      	<!-- private int currentPageNo;
-				private int recordCountPerPage;
-				private int pageSize;
-				private int totalRecordCount; -->
-      	</div>
+		<div class="paging">
+		    <c:if test="${paginationInfo.firstPageNoOnPageList > 1}">
+		        <a href="javascript:goToPage(1)">처음</a>
+		        <a href="javascript:goToPage(${paginationInfo.firstPageNoOnPageList - 1})">이전</a>
+		    </c:if>
+		
+		    <c:forEach var="i" begin="${paginationInfo.firstPageNoOnPageList}" end="${paginationInfo.lastPageNoOnPageList}">
+		        <c:choose>
+		            <c:when test="${i == paginationInfo.currentPageNo}">
+		                <strong>${i}</strong>
+		            </c:when>
+		            <c:otherwise>
+		                <a href="javascript:goToPage(${i})">${i}</a>
+		            </c:otherwise>
+		        </c:choose>
+		    </c:forEach>
+		
+		    <c:if test="${paginationInfo.lastPageNoOnPageList < paginationInfo.totalPageCount}">
+		        <a href="javascript:goToPage(${paginationInfo.firstPageNoOnPageList + paginationInfo.pageSize})">다음</a>
+		        <a href="javascript:goToPage(${paginationInfo.totalPageCount})">마지막</a>
+		    </c:if>
+		</div>
 		
 		<!-- 글쓰기 버튼 -->
 		<div class="post-btn-container">
@@ -265,7 +227,23 @@ crossorigin="anonymous">
 	</div>
 </body>
 <script>
-	function selectBoardInfo(boardId) {		
+	function goToPage(pageNo) {
+	    var form = document.getElementById('boardListForm');
+	    var existingInput = form.querySelector('input[name="pageNo"]');
+	    if (existingInput) {
+	        form.removeChild(existingInput);
+	    }
+	    
+	    var pageNoInput = document.createElement('input');
+	    pageNoInput.setAttribute('type', 'hidden');
+	    pageNoInput.setAttribute('name', 'pageNo');
+	    pageNoInput.setAttribute('value', pageNo);
+	    form.appendChild(pageNoInput);
+	    
+	    form.submit();
+	}
+
+	/* function selectBoardInfo(boardId) {		
 		document.boardListForm.selectedBoardId.value = boardId;
 		document.boardListForm.action = "<c:url value = 'boardInfo.do' />";
 		document.boardListForm.submit();
@@ -278,8 +256,6 @@ crossorigin="anonymous">
 	}
 	
 	function pagination(pageNo) {
-		/* document.boardListForm.action = "<c:url value = 'boardList.do?pageNo=" + pageNo + "' />";
-		document.boardListForm.submit(); */
 		
 		$.ajax({
 			url: 'boardList.do?pageNo=' + pageNo,
@@ -311,6 +287,6 @@ crossorigin="anonymous">
 		
 						
 		console.log(listArea);
-	}
+	} */
 </script>
 </html>

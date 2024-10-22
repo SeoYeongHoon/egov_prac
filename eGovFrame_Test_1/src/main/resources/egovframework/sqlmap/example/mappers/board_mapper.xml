@@ -28,9 +28,20 @@
 	</select>
 	
 	<!-- 글 개수 -->
-	<select id="selectBoardCount" resultType="int">
-		SELECT COUNT(*) cnt
-		FROM board_write
+	<select id="selectBoardCount" parameterType="searchVO" resultType="int">
+	    SELECT COUNT(*)
+	    FROM board_write
+	    WHERE 1=1
+	    <if test="searchKeyword != null and searchKeyword != ''">
+	        <choose>
+	            <when test="searchCondition == 1">
+	                AND writer LIKE Concat('%' , #{searchKeyword} , '%')
+	            </when>
+	            <when test="searchCondition == 0">
+	                AND title LIKE Concat('%' , #{searchKeyword} , '%')
+	            </when>
+	        </choose>
+	    </if>
 	</select>
 	
 	<!-- 글 단건 조회 -->

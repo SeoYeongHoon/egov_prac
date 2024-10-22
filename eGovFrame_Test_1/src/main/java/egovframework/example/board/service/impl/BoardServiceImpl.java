@@ -37,7 +37,7 @@ public class BoardServiceImpl implements BoardService {
 
 	// 글 개수
 	@Override
-	public int selectBoardCount() throws Exception {
+	public int selectBoardCount(BoardSearchVO boardSearchVO) throws Exception {
 		return boardMapper.selectBoardCount();
 	}
 
