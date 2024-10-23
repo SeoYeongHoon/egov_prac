@@ -185,6 +185,14 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.19</version>
         </dependency>
+        
+        <dependency>
+		    <groupId>egovframework.rte</groupId>
+		    <artifactId>egovframework.rte.fdl.crypto</artifactId>
+		    <version>${egovframework.rte.version}</version>
+		</dependency>
+        
+        
 	</dependencies>
 
 	<build>

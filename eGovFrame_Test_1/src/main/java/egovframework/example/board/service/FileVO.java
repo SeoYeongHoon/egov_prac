@@ -11,6 +11,7 @@ public class FileVO {
 	private Long fileSize;
 	
 	private int no;
+	private int answerNo;
 	
 	public int getNo() {
 		return no;
@@ -53,5 +54,11 @@ public class FileVO {
 	public String toString() {
 		return "FileVO [fileNo=" + fileNo + ", fileName=" + fileName + ", extendedName=" + extendedName
 				+ ", uploadFile=" + uploadFile + ", fileSize=" + fileSize + "]";
+	}
+	public int getAnswerNo() {
+		return answerNo;
+	}
+	public void setAnswerNo(int answerNo) {
+		this.answerNo = answerNo;
 	}
 }

@@ -33,7 +33,7 @@
 				<label class="post-area-label" for="content">내용</label>
 				<textarea class="content-input" name="content"></textarea>
 			</div>
-			<!-- <div>
+			<div>
 				<div class="file-area">
 					<label style="width: 165.4px;" class="post-area-label" for="uploadFile">첨부파일</label>
 					<input class="upload-name" readonly />
@@ -41,7 +41,7 @@
 					<input type="file" onchange="addFile(this);" id="file" name="multiFile" multiple />
 				</div>
 				<div class="file-add-list" style="margin-left: 165.4px; margin-bottom: 20px;"></div>
-			</div> -->
+			</div>
 			<div class="save-btn-area">
 				<button class="post-save-btn" type="submit">저장</button>
 				<button class="post-cancel-btn" type="button" onClick="location.href='boardList.do'">취소</button>

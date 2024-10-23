@@ -11,7 +11,7 @@
 	<!-- 글 목록 -->
 	<select id="selectBoardList" parameterType="searchVO" resultType="boardVO">
 		SELECT *
-		FROM board_write
+		FROM board_write <!-- bw left join board_answer ba on bw.no = ba.no -->
 		WHERE 1=1
 		<if test="searchKeyword != null and searchKeyword != ''">
 			<choose>
@@ -25,12 +25,23 @@
 		</if>
 		ORDER BY no DESC
 		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
-	</select>
+	</select>		
 	
 	<!-- 글 개수 -->
-	<select id="selectBoardCount" resultType="int">
-		SELECT COUNT(*) cnt
-		FROM board_write
+	<select id="selectBoardCount" parameterType="searchVO" resultType="int">
+	    SELECT COUNT(*)
+	    FROM board_write
+	    WHERE 1=1
+	    <if test="searchKeyword != null and searchKeyword != ''">
+	        <choose>
+	            <when test="searchCondition == 1">
+	                AND writer LIKE Concat('%' , #{searchKeyword} , '%')
+	            </when>
+	            <when test="searchCondition == 0">
+	                AND title LIKE Concat('%' , #{searchKeyword} , '%')
+	            </when>
+	        </choose>
+	    </if>
 	</select>
 	
 	<!-- 글 단건 조회 -->
@@ -45,6 +56,7 @@
 		FROM board_write
 		WHERE no = #{no}
 	</select>
+	
 	<!-- 글 첨부파일 조회 -->
 	<select id="selectFilesInfo" parameterType="int" resultType="fileVO">
 		SELECT f.fileNo,
@@ -54,6 +66,17 @@
 			   b.no
 		FROM files f JOIN board_write b ON f.no = b.no
 		WHERE b.no = #{no}
+	</select>
+	
+	<!-- 답변글 첨부파일 조회 -->
+	<select id="selectAnswerFilesInfo" parameterType="int" resultType="fileVO">
+		SELECT f.fileNo,
+			   f.filename,
+			   f.extendedname,
+			   f.filesize,
+			   b.answerno
+		FROM files f JOIN board_answer b ON f.answerno = b.answerno
+		WHERE b.answerno = #{answerNo}
 	</select>
 	
 	<!-- 글 작성 -->
@@ -74,7 +97,7 @@
 	
 	
 	<!-- 첨부파일 업로드 -->
-	<insert id="insertFiles" parameterType="fileVO">
+	<insert id="insertFiles" parameterType="fileVO" useGeneratedKeys="true" keyProperty="fileNo">
 		INSERT INTO files (filename,
 						   extendedname,
 						   filesize,
@@ -89,25 +112,37 @@
 	<!-- 글 수정 -->
 	<update id="updateBoard">
 		UPDATE board_write
-		SET title = #{title},
+		SET writer = #{writer},
+			title = #{title},
 		    content = #{content}
 		WHERE no = #{no}
 	</update>
 	
 	<!-- 첨부파일 수정 -->
-	<update id="updateFiles" parameterType="int">
+	<update id="updateFiles" parameterType="fileVO">
 		UPDATE files
 		SET filename = #{fileName},
 			extendedname = #{extendedName},
 			filesize = #{fileSize}
 		WHERE no = #{no}
+		
+		<!-- <if test="fileName == null">
+			<choose>
+				<when test="searchCondition == 1">
+					AND writer LIKE Concat('%' , #{searchKeyword} , '%')
+				</when>
+				<when test="searchCondition == 0">
+					AND title LIKE Concat('%' , #{searchKeyword} , '%')
+				</when>
+			</choose>
+		</if> -->
 	</update>
 	
 	<!-- 첨부파일 삭제 -->
-	<!-- <delete id="deleteFiles" parameterType="int">
+	<delete id="deleteFiles" parameterType="int">
 		DELETE FROM files
 		WHERE fileno = #{fileNo}	
-	</delete> -->
+	</delete>
 	
 	<!-- 글 삭제 -->
 	<delete id="deletePost" parameterType="int">
@@ -122,6 +157,13 @@
 		WHERE no = #{no}
 	</update>
 	
+	<!-- 답변 조회수 증가 -->
+	<update id="updateAnswerView">
+		UPDATE board_answer
+		SET view = view + 1
+		WHERE answerno = #{answerNo}
+	</update>
+	
 	<!-- 다운로드 시 원래 이름 선택 -->
 	<select id="selectOriginalName" parameterType="fileVO" resultType="fileVO">
 		SELECT filename
@@ -130,7 +172,7 @@
 	</select>
 	
 	<!-- 답변글 작성 -->
-	<insert id="insertAnswer" parameterType="answerVO" useGeneratedKeys="true" keyProperty="no">
+	<insert id="insertAnswer" parameterType="answerVO" useGeneratedKeys="true" keyProperty="answerNo">
 		INSERT INTO board_answer (writer,
 								 password,
 								 title,
@@ -145,6 +187,19 @@
 				now(),
 				#{no}
 				)			 
+	</insert>
+	
+	<!-- 답변글 첨부파일 업로드 -->
+	<insert id="insertAnsweredFiles" parameterType="fileVO" useGeneratedKeys="true" keyProperty="fileNo">
+		INSERT INTO files (filename,
+						   extendedname,
+						   filesize,
+						   answerno)
+		VALUES (#{fileName},
+			    #{extendedName},
+			    #{fileSize},
+			    #{answerNo}
+		)						   
 	</insert>
 	
 	<!-- 답변 작성 시 게시글 상태변화 -->
@@ -171,6 +226,12 @@
 	<!-- 답변글 목록 출력 -->
 	<select id="selectAnswer" resultType="answerVO">
 		SELECT * 
+		FROM board_answer
+	</select>
+	
+	<!-- 답변 글 개수 -->
+	<select id="selectAnswerCount" parameterType="searchVO" resultType="int">
+		SELECT COUNT(*)
 		FROM board_answer
 	</select>
 </mapper>

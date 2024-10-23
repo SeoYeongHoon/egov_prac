@@ -10,6 +10,8 @@ public class BoardSearchVO {
     private int firstIndex;          // 첫 게시물 인덱스
     private int lastIndex;           // 마지막 게시물 인덱스
     private int recordCountPerPage;  // 한 페이지에 표시할 게시물 수
+    
+    private int isAnswered;
 
     public String getSearchKeyword() {
         return searchKeyword;
@@ -74,5 +76,13 @@ public class BoardSearchVO {
     public void setRecordCountPerPage(int recordCountPerPage) {
         this.recordCountPerPage = recordCountPerPage;
     }
+
+	public int getIsAnswered() {
+		return isAnswered;
+	}
+
+	public void setIsAnswered(int isAnswered) {
+		this.isAnswered = isAnswered;
+	}
 }
 

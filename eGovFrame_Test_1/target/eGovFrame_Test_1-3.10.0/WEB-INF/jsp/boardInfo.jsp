@@ -16,9 +16,17 @@
 	}
 
 	// 수정 기능
-	function updateFormBtn() {
-		document.boardInfoForm.action = "<c:url value='boardUpdatePage.do' />";
-		document.boardInfoForm.submit();
+	function updateFormBtn(pw) {
+		let pwCheck = document.querySelector('#passwordCheck');
+		
+		if (pwCheck.value === pw) {
+			document.boardInfoForm.action = "<c:url value='boardUpdatePage.do' />";
+			document.boardInfoForm.submit();
+		} else {
+			alert("잘못된 비밀번호");
+			pwCheck.value = '';
+			pwCheck.focus();
+		}
 	}
 	
 	// 삭제 기능
@@ -80,19 +88,19 @@
 				<div>
 					<c:forEach var="files" items="${fileInfo}" varStatus="status">
 						<c:set var="isFileExist" value="${files.fileName }" />
-							<c:choose>
-								<c:when test="${isFileExist eq '' }">
-									<span class="postFileSize"> 파일이 없습니다.</span>
-								</c:when>
-								<c:otherwise>
-									<input type="hidden" name="fileName" value="${files.fileName }" />
-		
-									<a style="display: block;" class="post-file" href="#" onClick="downloadFile('<c:out value="${files.extendedName }" />')">
-										<span>${files.fileName }</span>
-										<span class="postFileSize" style="color: darkgray;">[${files.fileSize } byte]</span>	
-									</a>
-								</c:otherwise>
-							</c:choose>
+						<c:choose>
+							<c:when test="${isFileExist eq '' }">
+								<span class="postFileSize"> 파일이 없습니다.</span>
+							</c:when>
+							<c:otherwise>
+								<input type="hidden" name="fileName" value="${files.fileName }" />
+	
+								<a style="display: block;" class="post-file" href="#" onClick="downloadFile('<c:out value="${files.extendedName }" />')">
+									<span>${files.fileName }</span>
+									<span class="postFileSize" style="color: darkgray;">[${files.fileSize } byte]</span>	
+								</a>
+							</c:otherwise>
+						</c:choose>
 					</c:forEach>
 				</div>
 			</div>
@@ -102,7 +110,7 @@
 				<button class="to-list-btn" type="button" onClick="location.href='boardList.do'">목록</button>				
 				<div class="option-btns">
 					<input style="width: 250px; height: 35px; padding-left: 10px; border: 1px solid rgb(0, 0, 0, 0.1);" type="password" id="passwordCheck" placeholder="비밀번호" />
-					<button class="to-update-btn" type="button" onClick="updateFormBtn()">수정</button>
+					<button class="to-update-btn" type="button" onClick="updateFormBtn('<c:out value="${boardInfo.password }" />')">수정</button>
 					<button class="to-delete-btn" type="button" onClick="deleteFormBtn('<c:out value="${boardInfo.password }" />')">삭제</button>
 					<button class="to-answer-btn" type="button" onClick="answerFormBtn('<c:out value="${boardInfo.no }" />')">답변등록</button>
 				</div>
