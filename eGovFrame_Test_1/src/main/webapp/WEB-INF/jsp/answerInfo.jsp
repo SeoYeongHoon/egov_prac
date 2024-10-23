@@ -8,10 +8,17 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/board.css'/>"/>
 </head>
+<script>
+	//파일다운 기능
+	function downloadFile(exName) {
+		document.boardInfoForm.action = "<c:url value='fileDownload.do?extendedName=" + exName + "' />";
+		document.boardInfoForm.submit();
+	}
+</script>
 <body>
 	<div id="boardInfo">
 		<form id="boardInfoForm" name="boardInfoForm" method="POST" encType="multipart/form-data">
-			<input type="hidden" name="no" value="${answerInfo.answerNo }" />
+			<input type="text" name="no" value="${answerInfo.answerNo }" />
 			<!-- 제목 -->
 			<h2 class="post-title">${answerInfo.title }</h2>
 			<!-- 작성자, 등록일, 조회수 -->
@@ -24,6 +31,29 @@
 			<!-- 내용 -->
 			<div class="post-content-container">
 				<p class="post-content">${answerInfo.content }</p>
+			</div>
+			
+			<!-- 첨부파일 -->
+			<div class="post-file-container" style="display: flex;">
+				<span style="margin-right: 30px;">첨부파일</span>
+				<div>
+					<c:forEach var="files" items="${fileInfo}" varStatus="status">
+						<c:set var="isFileExist" value="${files.fileName }" />
+						<c:choose>
+							<c:when test="${isFileExist eq '' }">
+								<span class="postFileSize"> 파일이 없습니다.</span>
+							</c:when>
+							<c:otherwise>
+								<input type="hidden" name="fileName" value="${files.fileName }" />
+	
+								<a style="display: block;" class="post-file" href="#" onClick="downloadFile('<c:out value="${files.extendedName }" />')">
+									<span>${files.fileName }</span>
+									<span class="postFileSize" style="color: darkgray;">[${files.fileSize } byte]</span>	
+								</a>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+				</div>
 			</div>
 		
 			<!-- 하단 버튼들(목록, 비밀번호 입력란, 수정, 삭제, 답변등록) -->

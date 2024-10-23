@@ -22,6 +22,19 @@
 		}
 	}
 </script>
+<style>
+	.delete {
+		cursor: pointer;
+		display: inline-flex; 
+		align-items: center;
+		height: 100%;
+		padding: 5px;
+	}
+	.delete:hover {
+		background-color: lightgray;
+		border-radius: 5px;
+	}
+</style>
 <body>
 	<div id="boardUpdate">
 		<form id="boardUpdateForm" name="boardUpdateForm" method="POST" encType="multipart/form-data">
@@ -29,7 +42,7 @@
 				<input type="hidden" name="no" value="${boardInfo.no }" />
 				<div class="writer-content">				
 					<label style="width: 165.4px;">작성자 <span style="color: red;">&#10004;</span></label>
-					<input class="info-input" type="text" name="writer" value="${boardInfo.writer }" readonly />
+					<input class="info-input" type="text" name="writer" value="${boardInfo.writer }" required/>
 				</div>
 				<div class="password-content">
 					<label class="post-area-label">비밀번호 <span style="color: red;">&#10004;</span></label>
@@ -44,9 +57,6 @@
 				<label class="post-area-label">내용</label>
 				<textarea class="content-input" name="content">${boardInfo.content }</textarea>
 			</div>
-			<%-- <div>
-				<input type="file" name="uploadFile" value="${boardInfo.fileName }" />
-			</div> --%>
 			<div>
 				<div class="file-area">
 					<label style="width: 165.4px;" class="post-area-label">첨부파일</label>
@@ -55,13 +65,22 @@
 					<input type="file" onchange="addFile(this);" id="file" name="multiFile" multiple />
 				</div>
 				<div class="file-update-list" style="margin-left: 165.4px;">
+				
 					<c:forEach var="files" items="${fileInfo }" varStatus="status">
-						<div class="filebox" id="file${files.fileNo }" style="height:35px; display: flex; align-items: center;">
-							<a style="display: flex; align-items: center; cursor: pointer;" class="delete" onClick="deleteFile('<c:out value="${files.fileNo }" />')">
-								<img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png' />" />
-								<p style="margin-left: 10px;" class="name">${files.fileName }</p>
-							</a>
-						</div>
+						<c:set var="isFileExist" value="${files.fileName }" />
+						<c:choose>
+							<c:when test="${isFileExist eq ''}">
+							</c:when>
+							<c:otherwise>
+								<input type="hidden" name="fileId" value="${files.fileNo }" />
+								<div class="filebox" id="file${files.fileNo }" style="height:35px; display: flex; align-items: center;">
+									<a style="display: flex; align-items: center; cursor: pointer;" class="delete" onClick="deleteFile('<c:out value="${files.fileNo }" />')">
+										<img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png' />" />
+										<span style="margin-left: 10px;" class="name">${files.fileName }</span>
+									</a>
+								</div>
+							</c:otherwise>
+						</c:choose>
 					</c:forEach>
 				</div>
 			</div>
@@ -93,7 +112,7 @@
 	        // 목록 추가
 	        let htmlData = '';
 	        htmlData += '<div id="file' + fileNo + '" class="filebox" style="height:35px; display: flex; align-items: center;">';
-	        htmlData += '<a style="display: flex; align-items: center; cursor: pointer;" class="delete" onclick="deleteFile(' + fileNo + ');"><img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png'/>"</a>';
+	        htmlData += '<a class="delete" onclick="deleteFile(' + fileNo + ');"><img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png'/>"</a>';
 	        htmlData += '<p style="margin-left: 10px;" class="name">' + file.name + '</p>';
 	        htmlData += '</div>';
 	        
@@ -119,7 +138,6 @@
 		});
 		
 		$('#file')[0].files = dataTransfer.files; // 제거 처리된 FileList를 돌려줌
-		
 	}
 </script>
 </html>

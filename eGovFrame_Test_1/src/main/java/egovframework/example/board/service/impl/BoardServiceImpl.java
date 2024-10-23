@@ -53,6 +53,12 @@ public class BoardServiceImpl implements BoardService {
 		return boardMapper.selectFilesInfo(no);
 	}
 
+	// 답변글 파일들 조회
+	@Override
+	public List<FileVO> selectAnswerFilesInfo(int answerNo) throws Exception {
+		return boardMapper.selectAnswerFilesInfo(answerNo);
+	}
+
 	// 글 작성
 	@Override
 	public void insertBoard(BoardVO vo) throws Exception {
@@ -64,6 +70,12 @@ public class BoardServiceImpl implements BoardService {
 	public void insertFiles(FileVO fileVO) throws Exception {
 		boardMapper.insertFiles(fileVO);
 	}
+
+	// 답변글 첨부파일 업로드
+	@Override
+	public void insertAnsweredFiles(FileVO fileVO) throws Exception {
+		boardMapper.insertAnsweredFiles(fileVO);
+	}
 	
 	// 글 수정
 	@Override
@@ -73,8 +85,14 @@ public class BoardServiceImpl implements BoardService {
 
 	// 첨부파일 수정
 	@Override
-	public void updateFiles(int no) throws Exception {
-		boardMapper.updateFiles(no);		
+	public void updateFiles(FileVO fileVO) throws Exception {
+		boardMapper.updateFiles(fileVO);		
+	}
+
+	// 첨부파일 삭제
+	@Override
+	public void deleteFiles(int fileNo) throws Exception {
+		boardMapper.deleteFiles(fileNo);
 	}
 
 	// 글 삭제
@@ -88,6 +106,13 @@ public class BoardServiceImpl implements BoardService {
 	public int updateView(int no) throws Exception {
 		return boardMapper.updateView(no);
 	}
+
+	// 답변글 조회수 증가
+	@Override
+	public int updateAnswerView(int no) throws Exception {
+		return boardMapper.updateAnswerView(no);
+	}
+
 
 	// 다운로드 시 원래 이름 선택
 	@Override
@@ -119,4 +144,9 @@ public class BoardServiceImpl implements BoardService {
 		return boardMapper.selectAnswer();
 	}
 
+	// 답변글 개수
+	@Override
+	public int selectAnswerCount(BoardSearchVO boardSearchVO) throws Exception {
+		return boardMapper.selectAnswerCount(boardSearchVO);
+	}
 }

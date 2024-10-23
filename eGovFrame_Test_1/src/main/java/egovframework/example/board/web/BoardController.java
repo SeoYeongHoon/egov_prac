@@ -7,7 +7,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -50,7 +49,8 @@ public class BoardController {
 	                        @RequestParam(value = "pageNo", defaultValue = "1") String pageNo,
 	                        @ModelAttribute("searchVO") BoardSearchVO searchVO,
 	                        @RequestParam(required = false, defaultValue = "1") String searchCondition,
-	                        @RequestParam(required = false) String searchKeyword
+	                        @RequestParam(required = false) String searchKeyword,
+	                        @RequestParam(required = false) String isAnswered
 	                        ) throws Exception {
 
 	    // 페이지 번호와 검색 조건 설정
@@ -59,6 +59,8 @@ public class BoardController {
 	    searchVO.setSearchCondition(searchCondition);
 	    
 	    searchVO.setPageIndex(pageIndex); // 페이지 인덱스 설정
+	    
+	    // context-properties.xml 파일에서 설정한 페이징 속성값
 	    searchVO.setPageUnit(propertiesService.getInt("pageUnit"));
 	    searchVO.setPageSize(propertiesService.getInt("pageSize"));
 
@@ -72,6 +74,7 @@ public class BoardController {
 	    searchVO.setLastIndex(paginationInfo.getLastRecordIndex());
 	    searchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
 
+	    
 	    // 게시글 목록 조회
 	    List<BoardVO> boardList = boardService.selectBoardList(searchVO);
 	    List<AnswerVO> answerList = boardService.selectAnswer();
@@ -79,8 +82,8 @@ public class BoardController {
 	    // 전체 게시글 수 조회
 	    int totalCnt = boardService.selectBoardCount(searchVO);
 	    paginationInfo.setTotalRecordCount(totalCnt); // 전체 게시글 수 설정
+	   
 	    model.addAttribute("paginationInfo", paginationInfo);
-	    
 	    model.addAttribute("boardList", boardList);
 	    model.addAttribute("answerList", answerList);
 
@@ -155,6 +158,7 @@ public class BoardController {
 	// 답변 글 작성 기능
 	@RequestMapping(value = "/answerPost.do", method = RequestMethod.POST)
 	public String addAnswerPost(@ModelAttribute("answerVO") AnswerVO answerVO,
+								@ModelAttribute("vo") BoardVO vo,
 							    @ModelAttribute("fileVO") FileVO fileVO,
 							    @RequestParam("no") int no,
 							    @RequestParam("multiFile") List<MultipartFile> multipartFiles
@@ -163,37 +167,40 @@ public class BoardController {
 		boardService.insertAnswer(answerVO);
 		boardService.updateAnswerStatus(no);
 		
-//		List<Map<String, String>> fileList = new ArrayList<>();
-//		
-//		for (int i = 0; i < multipartFiles.size(); i++) {
-//			String extendedName = null;
-//			Long fileSize = null;
-//			
-//			String originName = multipartFiles.get(i).getOriginalFilename();
-//			String extentionName = FilenameUtils.getExtension(originName);
-//			UUID uuid = UUID.randomUUID();
-//			extendedName = uuid + "." + extentionName;
-//			fileSize = multipartFiles.get(i).getSize();
-//			
-//			extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
-//			// originName = URLEncoder.encode(originName, "UTF-8");
-//			
-//			Map<String, String> map = new HashMap<>();
-//			map.put("originName", originName);
-//			map.put("extendedName", extendedName);
-//			
-//			fileList.add(map);
-//			
-//			fileVO.setFileName(originName);
-//			fileVO.setExtendedName(extendedName);
-//			fileVO.setFileSize(fileSize);
-//			fileVO.setNo(answerVO.getNo());
-//			
-//			boardService.insertFiles(fileVO);
-//			
-//			multipartFiles.get(i).transferTo(new File("D:\\upload\\" + fileList.get(i).get("extendedName")));
-//		
-//		}
+		List<Map<String, String>> fileList = new ArrayList<>();
+		
+		System.out.println("파일들: " + multipartFiles);
+		
+		
+		for (int i = 0; i < multipartFiles.size(); i++) {
+			String extendedName = null;
+			Long fileSize = null;
+			
+			String originName = multipartFiles.get(i).getOriginalFilename();
+			String extentionName = FilenameUtils.getExtension(originName);
+			UUID uuid = UUID.randomUUID();
+			extendedName = uuid + "." + extentionName;
+			fileSize = multipartFiles.get(i).getSize();
+			
+			extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
+			// originName = URLEncoder.encode(originName, "UTF-8");
+			
+			Map<String, String> map = new HashMap<>();
+			map.put("originName", originName);
+			map.put("extendedName", extendedName);
+			
+			fileList.add(map);
+			
+			fileVO.setFileName(originName);
+			fileVO.setExtendedName(extendedName);
+			fileVO.setFileSize(fileSize);
+			fileVO.setAnswerNo(answerVO.getAnswerNo());
+			
+			boardService.insertAnsweredFiles(fileVO);
+			
+			multipartFiles.get(i).transferTo(new File("D:\\upload\\" + fileList.get(i).get("extendedName")));
+		
+		}
 		
 		return "redirect:boardList.do";
 	}
@@ -201,15 +208,13 @@ public class BoardController {
 	// 글 단건 조회
 	@RequestMapping(value = "/boardInfo.do")
 	public String boardInfo(@RequestParam("selectedBoardId") int boardId, Model model) throws Exception {
+		postView(boardId); // 조회수 증가
 		BoardVO boardVO = boardService.selectBoardInfo(boardId);
 		List<FileVO> fileVO = boardService.selectFilesInfo(boardId);
-		
-		System.out.println("파일 정보: " + fileVO.toString());
 		
 		model.addAttribute("boardInfo", boardVO);
 		model.addAttribute("fileInfo", fileVO);
 		
-		postView(boardId); // 조회수 증가
 		
 		return "boardInfo";
 	}
@@ -217,9 +222,12 @@ public class BoardController {
 	// 답변글 단건 조회
 	@RequestMapping(value = "/answerInfo.do")
 	public String answerInfo(@RequestParam("selectedAnswerNo") int answerNo, Model model) throws Exception {
+		answerView(answerNo);
 		AnswerVO answerVO = boardService.selectAnswerInfo(answerNo);
+		List<FileVO> fileVO = boardService.selectAnswerFilesInfo(answerNo);
 		
 		model.addAttribute("answerInfo", answerVO);
+		model.addAttribute("fileInfo", fileVO);
 		
 		return "answerInfo";
 	}
@@ -240,30 +248,82 @@ public class BoardController {
 	
 	// 글 수정 기능
 	@RequestMapping(value = "/boardUpdate.do", method = RequestMethod.POST)
-	public String updatePost(BoardVO vo, FileVO fileVO) throws Exception {
-//		// 파일 업로드
-//		String fileName = null;
-//		String extendedName = null;
-//		Long fileSize = null;
-//		MultipartFile uploadFile = fileVO.getUploadFile();
-//		
-//		if (!uploadFile.isEmpty()) {
-//			String originName = uploadFile.getOriginalFilename(); // 파일명
-//			String extensionName = FilenameUtils.getExtension(originName); // 확장자
-//			UUID uuid = UUID.randomUUID(); // 고유 식별자
-//			fileName = originName; // 첨부파일 파일 이름 표시용
-//			extendedName = uuid + "." + extensionName; // 파일 저장용 파일명
-//			
-//			fileSize = uploadFile.getSize();
-//			
-//			uploadFile.transferTo(new File("D:\\upload\\" + extendedName)); // 파일 내보내기
-//		}
-//		
-//		fileVO.setFileName(fileName);
-//		fileVO.setExtendedName(extendedName);
-//		fileVO.setFileSize(fileSize);
+	public String updatePost(BoardVO vo, 
+							 FileVO fileVO,
+							 @RequestParam(value = "fileId", required = false) List<Integer> fileNo,
+							 @RequestParam("multiFile") List<MultipartFile> multipartFiles
+							 ) throws Exception {
 		
 		boardService.updateBoard(vo);
+		
+//		if (fileNo != null) {
+//				for (int l = 0; l < fileNo.size(); l++) {
+//					deleteFile(fileNo.get(l));
+//					boardService.updateFiles(fileVO);
+//				}
+//		}
+		
+		List<Map<String, String>> fileList = new ArrayList<>();
+		
+		for (int i = 0; i < multipartFiles.size(); i++) {
+			String extendedName = null;
+			Long fileSize = null;
+			
+			String originName = multipartFiles.get(i).getOriginalFilename();
+			String extentionName = FilenameUtils.getExtension(originName);
+			UUID uuid = UUID.randomUUID();
+			extendedName = uuid + "." + extentionName;
+			fileSize = multipartFiles.get(i).getSize();
+			
+			extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
+			
+			Map<String, String> map = new HashMap<>();
+			map.put("originName", originName);
+			map.put("extendedName", extendedName);
+			
+			fileList.add(map);
+			
+			fileVO.setFileName(originName);
+			fileVO.setExtendedName(extendedName);
+			fileVO.setFileSize(fileSize);
+			fileVO.setNo(vo.getNo());
+			
+			boardService.insertFiles(fileVO);
+			
+			multipartFiles.get(i).transferTo(new File("D:\\upload\\" + fileList.get(i).get("extendedName")));
+		
+		}
+		
+//		List<Map<String, String>> fileList = new ArrayList<>();
+//		
+//		for (int i = 0; i < multipartFiles.size(); i++) {
+//			String extendedName = null;
+//			Long fileSize = null;
+//			
+//			String originName = multipartFiles.get(i).getOriginalFilename();
+//			String extentionName = FilenameUtils.getExtension(originName);
+//			UUID uuid = UUID.randomUUID();
+//			extendedName = uuid + "." + extentionName;
+//			fileSize = multipartFiles.get(i).getSize();
+//			
+//			extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
+//			
+//			Map<String, String> map = new HashMap<>();
+//			map.put("originName", originName);
+//			map.put("extendedName", extendedName);
+//			
+//			fileList.add(map);
+//			
+//			fileVO.setFileName(originName);
+//			fileVO.setExtendedName(extendedName);
+//			fileVO.setFileSize(fileSize);
+//			fileVO.setNo(vo.getNo());
+//			
+//			boardService.updateFiles(fileVO);
+//			
+//			multipartFiles.get(i).transferTo(new File("D:\\upload\\" + fileList.get(i).get("extendedName")));
+//		
+//		}
 				
 		return "redirect:boardList.do";
 	}
@@ -326,4 +386,13 @@ public class BoardController {
 		return boardService.updateView(no);
 	}
 	
+	// 답변글 조회수 기능
+	public int answerView(int no) throws Exception {
+		return boardService.updateAnswerView(no);
+	}
+	
+	// 첨부파일 삭제 기능
+	public void deleteFile(int fileNo) throws Exception {
+		boardService.deleteFiles(fileNo);
+	}
 }

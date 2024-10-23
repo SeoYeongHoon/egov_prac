@@ -9,102 +9,14 @@
 <head>
 <meta charset="UTF-8">
 <title>게시판</title>
-<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/board.css'/>"/>
 <link rel="stylesheet" 
 href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
 integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
 crossorigin="anonymous">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/eGovFrame_Test_1/css/egovframework/board.css" />
 </head>
-<script>
-	/* function fn_egov_link_page(pageNo){
-		location.href = "boardList.do?pageNo=" + pageNo;
-	} */
-	function pagination(pageNo) {
-    	document.boardListForm.pageIndex.value = pageNo;
-    	document.boardListForm.action = "<c:url value='/boardList.do'/>";
-       	document.boardListForm.submit();
-    }
-	
-	function updateBoardList(pageNo) {
-		let listArea = $("#boardListBody");
-        
-		listArea.html('');
-	}
-	
-	/* $(document).ready(function() {
-        goPage(1); // 첫 페이지를 로드
-    });
-
-    // 게시글 목록과 페이징 UI 업데이트 함수는 위에서 설명한 대로 포함
-    function goPage(pageIndex) {
-        var pageSize = 10; // 한 페이지당 게시글 수
-        var pageIndex = 1;
-
-        $.ajax({
-            url: "boardList.do",  // 서버에서 처리할 URL로 변경
-            type: "POST",
-            data: {
-                pageIndex: pageIndex,
-                pageSize: pageSize
-            },
-            success: function(data) {
-                updateBoardList(data.boardList);
-                updatePagination(data.paginationInfo);
-            },
-            error: function(xhr, status, error) {
-                console.log("ERROR: ", error);
-            }
-        });
-    }
-
-    // 게시글 목록 업데이트 함수
-    function updateBoardList(boardList) {
-        var listArea = $("#listArea");
-        var html = '<table class="table table-bordered">';
-        html += '<thead class="thead-light" style="text-align: center;">';
-        html += '<tr>';
-        html += '<th>순번</th><th>제목</th><th>작성자</th><th>등록일</th><th>조회수</th>';
-        html += '</tr></thead><tbody>';
-
-        $.each(boardList, function(index, item) {
-            html += '<tr>';
-            html += '<td style="text-align: center;">' + (item.rowNum) + '</td>';
-            html += '<td class="info-select" onClick="selectBoardInfo(\'' + item.no + '\')">' + item.title + '</td>';
-            html += '<td style="text-align: center;">' + item.writer + '</td>';
-            html += '<td style="text-align: center;">' + item.date + '</td>';
-            html += '<td style="text-align: center;">' + item.view + '</td>';
-            html += '</tr>';
-        });
-
-        html += '</tbody></table>';
-        listArea.html(html);  // 리스트 업데이트
-    }
-
-    // 페이징 UI 업데이트 함수
-    function updatePagination(paginationInfo) {
-        var paginationArea = $("#paginationArea");
-        var html = '<ul class="pagination">';
-
-        if (paginationInfo.firstPageNoOnPageList > 1) {
-            html += '<li class="page-item"><a class="page-link" href="javascript:goPage(1)">처음</a></li>';
-            html += '<li class="page-item"><a class="page-link" href="javascript:goPage(' + (paginationInfo.firstPageNoOnPageList - 1) + ')">이전</a></li>';
-        }
-
-        for (var i = paginationInfo.firstPageNoOnPageList; i <= paginationInfo.lastPageNoOnPageList; i++) {
-            html += '<li class="page-item ' + (paginationInfo.currentPageNo == i ? 'active' : '') + '">';
-            html += '<a class="page-link" href="javascript:goPage(' + i + ')">' + i + '</a></li>';
-        }
-
-        if (paginationInfo.lastPageNoOnPageList < paginationInfo.totalPageCount) {
-            html += '<li class="page-item"><a class="page-link" href="javascript:goPage(' + (paginationInfo.firstPageNoOnPageList + 1) + ')">다음</a></li>';
-            html += '<li class="page-item"><a class="page-link" href="javascript:goPage(' + paginationInfo.totalPageCount + ')">끝</a></li>';
-        }
-
-        html += '</ul>';
-        paginationArea.html(html);  // 페이징 UI 업데이트
-    } */
-    
+<script>    
     function searchKeywordBtn() {
         let url = "boardList.do";
         url += "?searchCondition=" + $('#searchCondition').val();
@@ -113,6 +25,63 @@ crossorigin="anonymous">
         console.log(url);
     }
 </script>
+<style>
+	#boardContainer {
+		max-width: 1000px;
+		margin: 30px auto;
+	}
+	
+	.paging {
+		text-align: center;
+	    margin-top: 30px;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	}
+	
+	.paging-number-on {
+		background-color: darkgray;
+	    display: inline-block;
+	    color: white;
+	    font-size: 18pt;
+	    width: 40px;
+	    height: 40px;
+	    margin: 5px;
+	    border-radius: 5px;
+	}
+	
+	.paging-number-off {
+		display: inline-block;
+	    color: black;
+	    font-size: 18pt;
+	    width: 40px;
+	    height: 40px;
+	    margin: 5px;
+	    border-radius: 5px;
+	    border: 1px solid darkgray;
+	}
+	.paging-number-off:hover {
+		text-decoration: none;
+		background-color: darkgray;
+	    color: white;
+	}
+	
+	.paging-move-btn {
+		display: inline-block;
+	    color: black;
+	    font-size: 17pt;
+	    width: 40px;
+	    height: 40px;
+	    margin: 5px;
+	    border-radius: 5px;
+	    border: 1px solid darkgray;
+	}
+	.paging-move-btn:hover {
+		text-decoration: none;
+		background-color: darkgray;
+	    color: white;
+	}
+</style>
 <body>
 	<div id="boardContainer">
 		
@@ -156,17 +125,18 @@ crossorigin="anonymous">
 		            <thead class="thead-light" style="text-align: center;">
 		                <tr>
 		                    <th>순번</th>
-		                    <th>제목</th>
+		                    <th style="width: 440px;">제목</th>
 		                    <th>작성자</th>
-		                    <th>등록일</th>
-		                    <th>조회수</th>
+		                    <th style="width: 160px;">등록일</th>
+		                    <th style="width: 100px;">조회수</th>
 		                </tr>
 		            </thead>
 		            <tbody id="listBodyArea">
 		                <c:forEach var="list" items="${boardList}" varStatus="status">
+	                    	<input type="hidden" value="${list.isAnswered }" />
 		                    <tr>
 		                        <td style="text-align: center;">
-		                            <c:out value="${paginationInfo.totalRecordCount+1 - ((searchVO.pageIndex-1) * searchVO.pageSize + status.count)}"/>
+		                            <c:out value="${paginationInfo.totalRecordCount+1 - ((searchVO.pageIndex-1) * searchVO.pageSize + status.index)}"/>
 		                        </td>
 		                        <td class="info-select" onClick="selectBoardInfo('<c:out value="${list.no }" />')">
 		                            <c:out value="${list.title }"/>
@@ -178,11 +148,11 @@ crossorigin="anonymous">
 		                    
 		                    <c:set var="isAnswered" value="${list.isAnswered }" />
 		                    <c:forEach var="answer" items="${answerList }" varStatus="status">
-		                        <c:if test="${isAnswered eq 1 and list.no eq answer.no}">
+		                    	<c:if test="${isAnswered eq 1 and list.no eq answer.no}">
 		                            <tr style="background-color: aliceblue;">
 		                                <td style="text-align: center">[답변]</td>
 		                                <td class="info-select" onClick="selectAnswerInfo('<c:out value="${answer.answerNo }" />')">
-		                                    ㄴ <c:out value="${answer.title }"/>
+											ㄴ &nbsp<c:out value="${answer.title }"/>
 		                                </td>
 		                                <td style="text-align: center;"><c:out value="${answer.writer }"/></td>
 		                                <td style="text-align: center;"><c:out value="${answer.date }"/></td>
@@ -198,26 +168,38 @@ crossorigin="anonymous">
 		
 		<!-- 페이징 -->
 		<div class="paging">
-		    <c:if test="${paginationInfo.firstPageNoOnPageList > 1}">
-		        <a href="javascript:goToPage(1)">처음</a>
-		        <a href="javascript:goToPage(${paginationInfo.firstPageNoOnPageList - 1})">이전</a>
-		    </c:if>
-		
+			<c:choose>
+				<c:when test="${paginationInfo.currentPageNo > 1}">
+					<a class="paging-move-btn" href="javascript:goToPage(1)">&laquo;</a>
+		        	<a class="paging-move-btn" href="javascript:goToPage(${paginationInfo.currentPageNo - 1})">&lt;</a>
+				</c:when>
+				<c:otherwise>
+					<a style="width: 40px; margin: 5px;"></a>
+					<a style="width: 40px; margin: 5px;"></a>
+				</c:otherwise>
+			</c:choose>
+		    
 		    <c:forEach var="i" begin="${paginationInfo.firstPageNoOnPageList}" end="${paginationInfo.lastPageNoOnPageList}">
 		        <c:choose>
 		            <c:when test="${i == paginationInfo.currentPageNo}">
-		                <strong>${i}</strong>
+		                <span class="paging-number-on">${i}</span>
 		            </c:when>
 		            <c:otherwise>
-		                <a href="javascript:goToPage(${i})">${i}</a>
+		                <a class="paging-number-off" href="javascript:goToPage(${i})">${i}</a>
 		            </c:otherwise>
 		        </c:choose>
 		    </c:forEach>
-		
-		    <c:if test="${paginationInfo.lastPageNoOnPageList < paginationInfo.totalPageCount}">
-		        <a href="javascript:goToPage(${paginationInfo.firstPageNoOnPageList + paginationInfo.pageSize})">다음</a>
-		        <a href="javascript:goToPage(${paginationInfo.totalPageCount})">마지막</a>
-		    </c:if>
+		    
+		    <c:choose>
+		    	<c:when test="${paginationInfo.currentPageNo < paginationInfo.totalPageCount}">
+		    		<a class="paging-move-btn" href="javascript:goToPage(${paginationInfo.currentPageNo + 1})">&gt;</a>
+		        	<a class="paging-move-btn" href="javascript:goToPage(${paginationInfo.totalPageCount})">&raquo;</a>
+		    	</c:when>
+		    	<c:otherwise>
+		    		<a style="width: 40px; margin: 5px;"></a>
+					<a style="width: 40px; margin: 5px;"></a>
+		    	</c:otherwise>
+		    </c:choose>
 		</div>
 		
 		<!-- 글쓰기 버튼 -->
@@ -243,7 +225,7 @@ crossorigin="anonymous">
 	    form.submit();
 	}
 
-	/* function selectBoardInfo(boardId) {		
+	function selectBoardInfo(boardId) {		
 		document.boardListForm.selectedBoardId.value = boardId;
 		document.boardListForm.action = "<c:url value = 'boardInfo.do' />";
 		document.boardListForm.submit();
@@ -254,39 +236,5 @@ crossorigin="anonymous">
 		document.boardListForm.action = "<c:url value = 'answerInfo.do' />";
 		document.boardListForm.submit();
 	}
-	
-	function pagination(pageNo) {
-		
-		$.ajax({
-			url: 'boardList.do?pageNo=' + pageNo,
-			success: function(data) {
-				updateListForm(pageNo);
-			},
-			error: function(err) {
-				console.log("ERROR: ", err);
-			}
-			
-		});
-	}
-	
-	function updateListForm(pageNo) {
-		let listArea = document.querySelector('#listBodyArea');
-		let listForm = `
-						<c:forEach var="list" items="${boardList}" varStatus="status">
-				   			<tr>
-				    			<td align="center" class="listtd"><c:out value="${paginationInfo.totalRecordCount+1 - ((searchVO.pageIndex-1) * searchVO.pageSize + status.count)}"/></td>
-				   				<td class="info-select" onClick="selectBoardInfo('<c:out value="${list.no }" />')"><c:out value="${list.title }" /></td>
-				   				<td style="text-align: center;"><c:out value="${list.writer }" /></td>
-				   				<td style="text-align: center;"><c:out value="${list.date }" /></td>
-				   				<td style="text-align: center;"><c:out value="${list.view }" /></td>
-				   			</tr>
-						</c:forEach>
-						`;
-		
-		listArea.innerHTML = listForm;						
-		
-						
-		console.log(listArea);
-	} */
 </script>
 </html>

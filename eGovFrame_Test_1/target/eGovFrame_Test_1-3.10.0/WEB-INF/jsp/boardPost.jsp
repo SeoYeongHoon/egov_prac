@@ -8,6 +8,19 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/board.css'/>"/>
 </head>
+<style>
+	.delete {
+		cursor: pointer;
+		display: inline-flex; 
+		align-items: center;
+		height: 100%;
+		padding: 5px;
+	}
+	.delete:hover {
+		background-color: lightgray;
+		border-radius: 5px;
+	}
+</style>
 <body>
 	<div id="boardAdd">
 		<form action="boardPost.do" id="boardPostForm" name="boardPostForm" method="POST" encType="multipart/form-data">
@@ -63,7 +76,7 @@
 	        // 목록 추가
 	        let htmlData = '';
 	        htmlData += '<div id="file' + fileNo + '" class="filebox" style="height:35px;">';
-	        htmlData += '<a style="display: flex; align-items: center;" class="delete" onclick="deleteFile(' + fileNo + ');"><img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png'/>"</a>';
+	        htmlData += '<a class="delete" onclick="deleteFile(' + fileNo + ');"><img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png'/>"</a>';
 	        htmlData += '<p style="margin-left: 10px;" class="name">' + file.name + '</p>';
 	        htmlData += '</div>';
 	        
@@ -73,8 +86,6 @@
 	}
 	
 	function deleteFile(num) {
-		// let fileDiv = document.querySelector("#file" + num);
-		// let selectedDiv = $(num).closest('div');
 		document.querySelector("#file" + num).remove(); // div 삭제
 		
 		const dataTransfer = new DataTransfer();
@@ -85,7 +96,6 @@
 		let dataArray = Array.from(files); // 변수에 할당된 파일을 배열로 변환
 		
 		dataArray.splice(num, 1); // 해당하는 index의 파일을 배열에서 제거
-		console.log("파일 제거 후: ", dataArray[num]);
 		
 		dataArray.forEach(function(file) {
 			dataTransfer.items.add(file);
@@ -93,8 +103,6 @@
 		});
 		
 		$('#file')[0].files = dataTransfer.files; // 제거 처리된 FileList를 돌려줌
-		
-		console.log("제거 후 파일들: ", files);
 		
 	}
 </script>
