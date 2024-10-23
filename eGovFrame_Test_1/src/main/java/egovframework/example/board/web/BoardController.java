@@ -2,6 +2,7 @@ package egovframework.example.board.web;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -52,7 +53,6 @@ public class BoardController {
 	                        @RequestParam(required = false) String searchKeyword,
 	                        @RequestParam(required = false) String isAnswered
 	                        ) throws Exception {
-
 	    // 페이지 번호와 검색 조건 설정
 	    int pageIndex = Integer.parseInt(pageNo);
 	    searchVO.setSearchKeyword(searchKeyword);
@@ -77,10 +77,14 @@ public class BoardController {
 	    
 	    // 게시글 목록 조회
 	    List<BoardVO> boardList = boardService.selectBoardList(searchVO);
+	    System.out.println(boardList.toString());
 	    List<AnswerVO> answerList = boardService.selectAnswer();
 	    
 	    // 전체 게시글 수 조회
+//	    int totalCnt = boardService.selectBoardCount(searchVO);
+//	    paginationInfo.setTotalRecordCount(totalCnt); // 전체 게시글 수 설정
 	    int totalCnt = boardService.selectBoardCount(searchVO);
+	    totalCnt += boardService.selectAnswerCount(); // 답글 수를 포함하여 전체 게시물 수를 반영
 	    paginationInfo.setTotalRecordCount(totalCnt); // 전체 게시글 수 설정
 	   
 	    model.addAttribute("paginationInfo", paginationInfo);
@@ -107,10 +111,7 @@ public class BoardController {
 		boardService.insertBoard(vo);
 		
 		List<Map<String, String>> fileList = new ArrayList<>();
-		
-		System.out.println("파일들: " + multipartFiles);
-		
-		
+				
 		for (int i = 0; i < multipartFiles.size(); i++) {
 			String extendedName = null;
 			Long fileSize = null;
@@ -147,7 +148,6 @@ public class BoardController {
 	// 답변 글 작성 페이지 이동
 	@RequestMapping(value = "/boardAnswerPage.do")
 	public String answerPage(@RequestParam("no") int no, Model model) throws Exception {
-		System.out.println("번호: " + no);
 		BoardVO boardVO = new BoardVO();
 		boardVO = boardService.selectBoardInfo(no);
 		
@@ -249,84 +249,54 @@ public class BoardController {
 	// 글 수정 기능
 	@RequestMapping(value = "/boardUpdate.do", method = RequestMethod.POST)
 	public String updatePost(BoardVO vo, 
-							 FileVO fileVO,
-							 @RequestParam(value = "fileId", required = false) List<Integer> fileNo,
-							 @RequestParam("multiFile") List<MultipartFile> multipartFiles
-							 ) throws Exception {
-		
-		boardService.updateBoard(vo);
-		
-//		if (fileNo != null) {
-//				for (int l = 0; l < fileNo.size(); l++) {
-//					deleteFile(fileNo.get(l));
-//					boardService.updateFiles(fileVO);
-//				}
-//		}
-		
-		List<Map<String, String>> fileList = new ArrayList<>();
-		
-		for (int i = 0; i < multipartFiles.size(); i++) {
-			String extendedName = null;
-			Long fileSize = null;
-			
-			String originName = multipartFiles.get(i).getOriginalFilename();
-			String extentionName = FilenameUtils.getExtension(originName);
-			UUID uuid = UUID.randomUUID();
-			extendedName = uuid + "." + extentionName;
-			fileSize = multipartFiles.get(i).getSize();
-			
-			extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
-			
-			Map<String, String> map = new HashMap<>();
-			map.put("originName", originName);
-			map.put("extendedName", extendedName);
-			
-			fileList.add(map);
-			
-			fileVO.setFileName(originName);
-			fileVO.setExtendedName(extendedName);
-			fileVO.setFileSize(fileSize);
-			fileVO.setNo(vo.getNo());
-			
-			boardService.insertFiles(fileVO);
-			
-			multipartFiles.get(i).transferTo(new File("D:\\upload\\" + fileList.get(i).get("extendedName")));
-		
-		}
-		
-//		List<Map<String, String>> fileList = new ArrayList<>();
-//		
-//		for (int i = 0; i < multipartFiles.size(); i++) {
-//			String extendedName = null;
-//			Long fileSize = null;
-//			
-//			String originName = multipartFiles.get(i).getOriginalFilename();
-//			String extentionName = FilenameUtils.getExtension(originName);
-//			UUID uuid = UUID.randomUUID();
-//			extendedName = uuid + "." + extentionName;
-//			fileSize = multipartFiles.get(i).getSize();
-//			
-//			extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
-//			
-//			Map<String, String> map = new HashMap<>();
-//			map.put("originName", originName);
-//			map.put("extendedName", extendedName);
-//			
-//			fileList.add(map);
-//			
-//			fileVO.setFileName(originName);
-//			fileVO.setExtendedName(extendedName);
-//			fileVO.setFileSize(fileSize);
-//			fileVO.setNo(vo.getNo());
-//			
-//			boardService.updateFiles(fileVO);
-//			
-//			multipartFiles.get(i).transferTo(new File("D:\\upload\\" + fileList.get(i).get("extendedName")));
-//		
-//		}
-				
-		return "redirect:boardList.do";
+	                         @RequestParam(value = "fileId", required = false) List<Integer> fileNo,
+	                         @RequestParam("multiFile") List<MultipartFile> multipartFiles) throws Exception {
+	    
+	    // 게시판 글 수정
+	    boardService.updateBoard(vo);
+	    
+	    if (multipartFiles.isEmpty()) {
+	        return "redirect:boardList.do"; // 파일이 없으면 바로 목록으로 리다이렉트
+	    }
+	    
+	    for (MultipartFile multipartFile : multipartFiles) {
+	        if (multipartFile.isEmpty()) {
+	            continue; // 비어있는 파일은 무시
+	        }
+	        
+	        // 파일 정보 설정
+	        String originName = multipartFile.getOriginalFilename();
+	        String extensionName = FilenameUtils.getExtension(originName);
+	        UUID uuid = UUID.randomUUID();
+	        String extendedName = uuid + "." + extensionName;
+	        Long fileSize = multipartFile.getSize();
+	        
+	        // 파일 저장 경로
+	        String filePath = "D:\\upload\\" + extendedName;
+
+	        // FileVO 인스턴스 생성
+	        FileVO fileVO = new FileVO();
+	        fileVO.setFileName(originName);
+	        fileVO.setExtendedName(extendedName);
+	        fileVO.setFileSize(fileSize);
+	        fileVO.setNo(vo.getNo());
+	        
+	        // DB에 파일 정보 저장
+	        boardService.insertFiles(fileVO);
+	        
+	        // 파일 저장
+	        try {
+	            multipartFile.transferTo(new File(filePath));
+	        } catch (IOException e) {
+	            // 예외 처리 (예: 로그 기록, 사용자에게 오류 메시지 표시 등)
+	            e.printStackTrace();
+	            // 필요시 특정 페이지로 리다이렉트할 수 있음
+	        }
+	    }
+	    
+	    return "redirect:boardList.do";
 	}
+
 	
 	// 글 삭제 기능
 	@RequestMapping(value = "/boardDelete.do")
@@ -339,46 +309,60 @@ public class BoardController {
 	// 파일 다운로드
 	@RequestMapping(value = "/fileDownload.do")
 	public void fileDownload(HttpServletRequest req, HttpServletResponse res) throws Exception {
-		
-		// boardInfo.jsp에서 데이터 이름 가져오기
-		String extendedName = req.getParameter("extendedName"); // upload할 때 변경된 파일 이름
-		// String realName = req.getParameter("fileName"); // 원래 파일명(ex: apple.jpg)
-		
-		FileVO fileVO = boardService.selectOriginalName(extendedName);
-		String realName = fileVO.getFileName();
-		System.out.println("파일이름: " + realName);
-		
-		// 파일 있는 경로
-		String downPathFrom = "D:\\upload\\" + extendedName;
-		
-		// 에서 추출
-		File file = new File(downPathFrom);
-		if (!file.exists()) {
-			return;
-		}
-		
-		// 여기서부터 주석 필요
-		FileInputStream fileInputStream = new FileInputStream(downPathFrom);
+	    
+	    // boardInfo.jsp에서 데이터 이름 가져오기
+	    String extendedName = req.getParameter("extendedName"); // upload할 때 변경된 파일 이름
+	    // String realName = req.getParameter("fileName"); // 원래 파일명(ex: apple.jpg)
+	    
+	    // 파일의 원래 이름을 가져오기 위해 service 호출
+	    FileVO fileVO = boardService.selectOriginalName(extendedName);
+	    String realName = fileVO.getFileName();
+	    System.out.println("파일이름: " + realName);
+	    
+	    // 다운로드할 파일의 경로 설정
+	    String downPathFrom = "D:\\upload\\" + extendedName;
+	    
+	    // 파일 객체 생성
+	    File file = new File(downPathFrom);
+	    
+	    // 파일이 존재하지 않을 경우 처리
+	    if (!file.exists()) {
+	        return; // 파일이 없으면 아무 것도 하지 않고 종료
+	    }
+	    
+	    // 여기서부터 주석 필요
+	    // 파일을 읽기 위한 FileInputStream 생성
+	    FileInputStream fileInputStream = new FileInputStream(downPathFrom);
 
-		extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
-		realName = URLEncoder.encode(realName, "UTF-8"); // 한글 이름 파일 다운가능하게 인코딩
-		
-		res.setContentType("application/octet-stream");
-		res.setHeader("Content-Disposition", "attachment; filename=" + realName); // 다운로드 하는 파일 이름 원래 이름으로 설정
-		
-		OutputStream outputStream = res.getOutputStream();
-		
-		int length;
-		byte[] b = new byte[(int) file.length()];
-		while ((length = fileInputStream.read(b)) > 0) {
-			outputStream.write(b, 0, length);
-		}
+	    // 파일 이름 인코딩 처리 (한글 파일명 지원)
+	    extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
+	    realName = URLEncoder.encode(realName, "UTF-8"); // 한글 이름 파일 다운 가능하게 인코딩
+	    
+	    // 응답의 콘텐츠 유형을 설정
+	    res.setContentType("application/octet-stream");
+	    // 다운로드할 파일 이름을 설정
+	    res.setHeader("Content-Disposition", "attachment; filename=" + realName); // 다운로드하는 파일 이름을 원래 이름으로 설정
+	    
+	    // 응답의 OutputStream을 가져옴
+	    OutputStream outputStream = res.getOutputStream();
+	    
+	    int length;
+	    // 파일의 크기에 맞춰 바이트 배열 생성
+	    byte[] b = new byte[(int) file.length()];
+	    
+	    // 파일을 읽어서 클라이언트로 전송
+	    while ((length = fileInputStream.read(b)) > 0) {
+	        outputStream.write(b, 0, length); // 읽은 데이터만큼 OutputStream에 쓰기
+	    }
 
-		outputStream.flush();
+	    // OutputStream을 비움
+	    outputStream.flush();
 
-		outputStream.close();
-		fileInputStream.close();
+	    // 스트림 닫기
+	    outputStream.close(); // OutputStream 닫기
+	    fileInputStream.close(); // FileInputStream 닫기
 	}
+
 	
 	
 	// 글 조회수 기능
@@ -393,6 +377,6 @@ public class BoardController {
 	
 	// 첨부파일 삭제 기능
 	public void deleteFile(int fileNo) throws Exception {
-		boardService.deleteFiles(fileNo);
+		boardService.deleteFile(fileNo);
 	}
 }

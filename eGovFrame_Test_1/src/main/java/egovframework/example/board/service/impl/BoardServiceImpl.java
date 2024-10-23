@@ -91,8 +91,8 @@ public class BoardServiceImpl implements BoardService {
 
 	// 첨부파일 삭제
 	@Override
-	public void deleteFiles(int fileNo) throws Exception {
-		boardMapper.deleteFiles(fileNo);
+	public void deleteFile(int fileNo) throws Exception {
+		boardMapper.deleteFile(fileNo);
 	}
 
 	// 글 삭제
@@ -146,7 +146,12 @@ public class BoardServiceImpl implements BoardService {
 
 	// 답변글 개수
 	@Override
-	public int selectAnswerCount(BoardSearchVO boardSearchVO) throws Exception {
-		return boardMapper.selectAnswerCount(boardSearchVO);
+	public int selectAnswerCount() throws Exception {
+		return boardMapper.selectAnswerCount();
+	}
+
+	@Override
+	public FileVO getFileInfo(int fileNo) throws Exception {
+		return boardMapper.getFileInfo(fileNo);
 	}
 }

@@ -14,6 +14,36 @@ public class BoardVO {
 	private int pageSize;
 	private int offset;
 	
+	private int answerNo;
+	private String answerTitle;
+	private String answerWriter;
+	private String answerDate;
+	private String answerView;
+	
+	public String getAnswerTitle() {
+		return answerTitle;
+	}
+	public void setAnswerTitle(String answerTitle) {
+		this.answerTitle = answerTitle;
+	}
+	public String getAnswerWriter() {
+		return answerWriter;
+	}
+	public void setAnswerWriter(String answerWriter) {
+		this.answerWriter = answerWriter;
+	}
+	public String getAnswerDate() {
+		return answerDate;
+	}
+	public void setAnswerDate(String answerDate) {
+		this.answerDate = answerDate;
+	}
+	public String getAnswerView() {
+		return answerView;
+	}
+	public void setAnswerView(String answerView) {
+		this.answerView = answerView;
+	}
 	public int getPageSize() {
 		return pageSize;
 	}
@@ -38,12 +68,12 @@ public class BoardVO {
 	public void setWriter(String writer) {
 		this.writer = writer;
 	}
-	public String getPassword() {
-		return password;
-	}
 	public void setPassword(String password) {
-		this.password = password;
-	}
+        this.password = password;
+    }
+    public String getPassword() {
+        return password;
+    }
 	public String getTitle() {
 		return title;
 	}
@@ -68,17 +98,23 @@ public class BoardVO {
 	public void setView(String view) {
 		this.view = view;
 	}
-	
-	@Override
-	public String toString() {
-		return "BoardVO [no=" + no + ", writer=" + writer + ", password=" + password + ", title=" + title + ", content="
-				+ content + ", date=" + date + ", view=" + view + ", pageSize=" + pageSize
-				+ ", offset=" + offset + "]";
-	}
 	public int getIsAnswered() {
 		return isAnswered;
 	}
 	public void setIsAnswered(int isAnswered) {
 		this.isAnswered = isAnswered;
 	}
+	public int getAnswerNo() {
+		return answerNo;
+	}
+	public void setAnswerNo(int answerNo) {
+		this.answerNo = answerNo;
+	}
+	@Override
+	public String toString() {
+		return "BoardVO [no=" + no + ", writer=" + writer + ", password=" + password + ", title=" + title + ", content="
+				+ content + ", date=" + date + ", view=" + view + ", isAnswered=" + isAnswered + ", pageSize="
+				+ pageSize + ", offset=" + offset + ", answerNo=" + answerNo + "]";
+	}
+	
 }

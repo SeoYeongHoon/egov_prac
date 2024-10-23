@@ -68,6 +68,13 @@
 		WHERE b.no = #{no}
 	</select>
 	
+	<!-- 첨부파일 단건 조회 -->
+	<select id="getFileInfo" parameterType="int" resultType="fileVO">
+		SELECT *
+		FROM files
+		WHERE fileno = #{fileNo}
+	</select>
+	
 	<!-- 답변글 첨부파일 조회 -->
 	<select id="selectAnswerFilesInfo" parameterType="int" resultType="fileVO">
 		SELECT f.fileNo,
@@ -139,7 +146,7 @@
 	</update>
 	
 	<!-- 첨부파일 삭제 -->
-	<delete id="deleteFiles" parameterType="int">
+	<delete id="deleteFile" parameterType="int">
 		DELETE FROM files
 		WHERE fileno = #{fileNo}	
 	</delete>

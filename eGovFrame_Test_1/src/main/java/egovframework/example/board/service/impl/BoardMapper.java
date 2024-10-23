@@ -27,6 +27,9 @@ public interface BoardMapper {
 	// 답변글 파일들 조회
 	List<FileVO> selectAnswerFilesInfo(int answerNo) throws Exception;
 	
+	// 파일 단건 조회
+	FileVO getFileInfo(int fileNo) throws Exception;
+	
 	// 글 작성
 	void insertBoard(BoardVO vo) throws Exception;
 	
@@ -43,7 +46,7 @@ public interface BoardMapper {
 	void updateFiles(FileVO fileVO) throws Exception;
 	
 	// 첨부파일 삭제
-	void deleteFiles(int fileNo) throws Exception;
+	void deleteFile(int fileNo) throws Exception;
 	
 	// 글 삭제
 	void deletePost(int no) throws Exception;
@@ -70,5 +73,5 @@ public interface BoardMapper {
 	List<AnswerVO> selectAnswer() throws Exception;
 	
 	// 답변글 개수
-	int selectAnswerCount(BoardSearchVO boardSearchVO) throws Exception;
+	int selectAnswerCount() throws Exception;
 }
