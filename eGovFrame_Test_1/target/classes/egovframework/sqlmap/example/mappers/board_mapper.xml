@@ -155,7 +155,7 @@
 	</update>
 	
 	<!-- 첨부파일 삭제 -->
-	<delete id="deleteFile" parameterType="int">
+	<delete id="deleteFiles" parameterType="int">
 		DELETE FROM files
 		WHERE fileno = #{fileNo}	
 	</delete>
@@ -252,7 +252,7 @@
 	</select>
 	
 	<!-- 답변 글 개수 -->
-	<select id="selectAnswerCount" parameterType="searchVO" resultType="int">
+	<select id="selectAnswerCount" resultType="int">
 		SELECT COUNT(*)
 		FROM board_answer
 	</select>

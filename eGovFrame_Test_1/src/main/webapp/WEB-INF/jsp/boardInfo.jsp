@@ -78,35 +78,12 @@
 			
 			<!-- 첨부파일 -->
 			<div class="post-file-container" style="display: flex;">
-<<<<<<< HEAD
-			    <span style="margin-right: 30px;">첨부파일</span>
-			    <div>
-			        <c:if test="${empty fileInfo}">
-			            <span class="postFileSize">파일이 없습니다.</span>
-			        </c:if>
-			        <c:forEach var="files" items="${fileInfo}" varStatus="status">
-			            <c:choose>
-			                <c:when test="${empty files.fileName}">
-			                    <span class="postFileSize">파일이 없습니다.</span>
-			                </c:when>
-			                <c:otherwise>
-			                    <input type="hidden" name="fileName" value="${files.fileName}" />
-			                    <a style="display: block;" class="post-file" href="#" onClick="downloadFile('<c:out value="${files.extendedName}" />')">
-			                        <span>${files.fileName}</span>
-			                        <span class="postFileSize" style="color: darkgray;">[${files.fileSize} byte]</span>
-			                    </a>
-			                </c:otherwise>
-			            </c:choose>
-			        </c:forEach>
-			    </div>
-=======
 				<span style="margin-right: 30px;">첨부파일</span>
 				<div>
 					<c:forEach var="files" items="${fileInfo}" varStatus="status">
 						<c:set var="isFileExist" value="${files.fileSize }" />
 						<c:if test="${isFileExist ne 0 }">
 							<input type="hidden" name="fileName" value="${files.fileName }" />
-
 							<a style="display: block;" class="post-file" href="#" onClick="downloadFile('<c:out value="${files.extendedName }" />')">
 								<span>${files.fileName }</span>
 								<span class="postFileSize" style="color: darkgray;">[${files.fileSize } byte]</span>	
@@ -114,7 +91,6 @@
 						</c:if>
 					</c:forEach>
 				</div>
->>>>>>> branch 'main' of https://github.com/SeoYeongHoon/egov_prac.git
 			</div>
 
 		

@@ -80,14 +80,10 @@ public class BoardController {
 	    
 	    // 게시글 목록 조회
 	    List<BoardVO> boardList = boardService.selectBoardList(searchVO);
-	    System.out.println(boardList.toString());
 	    List<AnswerVO> answerList = boardService.selectAnswer();
 	    
 	    // 전체 게시글 수 조회
-//	    int totalCnt = boardService.selectBoardCount(searchVO);
-//	    paginationInfo.setTotalRecordCount(totalCnt); // 전체 게시글 수 설정
 	    int totalCnt = boardService.selectBoardCount(searchVO);
-	    totalCnt += boardService.selectAnswerCount(); // 답글 수를 포함하여 전체 게시물 수를 반영
 	    paginationInfo.setTotalRecordCount(totalCnt); // 전체 게시글 수 설정
 	   
 	    model.addAttribute("paginationInfo", paginationInfo);
