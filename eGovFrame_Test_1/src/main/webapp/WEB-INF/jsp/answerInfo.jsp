@@ -14,11 +14,22 @@
 		document.boardInfoForm.action = "<c:url value='fileDownload.do?extendedName=" + exName + "' />";
 		document.boardInfoForm.submit();
 	}
+	
+	function updateFormBtn() {		
+		document.boardInfoForm.action = "<c:url value='answerUpdatePage.do' />";
+		document.boardInfoForm.submit();
+	}
+	
+	// 삭제 기능
+	function deleteFormBtn() {
+		document.boardInfoForm.action = "<c:url value='answerDelete.do' />";
+		document.boardInfoForm.submit();
+	}
 </script>
 <body>
 	<div id="boardInfo">
 		<form id="boardInfoForm" name="boardInfoForm" method="POST" encType="multipart/form-data">
-			<input type="text" name="no" value="${answerInfo.answerNo }" />
+			<input type="hidden" name="no" value="${answerInfo.answerNo }" />
 			<!-- 제목 -->
 			<h2 class="post-title">${answerInfo.title }</h2>
 			<!-- 작성자, 등록일, 조회수 -->
@@ -38,20 +49,15 @@
 				<span style="margin-right: 30px;">첨부파일</span>
 				<div>
 					<c:forEach var="files" items="${fileInfo}" varStatus="status">
-						<c:set var="isFileExist" value="${files.fileName }" />
-						<c:choose>
-							<c:when test="${isFileExist eq '' }">
-								<span class="postFileSize"> 파일이 없습니다.</span>
-							</c:when>
-							<c:otherwise>
-								<input type="hidden" name="fileName" value="${files.fileName }" />
-	
-								<a style="display: block;" class="post-file" href="#" onClick="downloadFile('<c:out value="${files.extendedName }" />')">
-									<span>${files.fileName }</span>
-									<span class="postFileSize" style="color: darkgray;">[${files.fileSize } byte]</span>	
-								</a>
-							</c:otherwise>
-						</c:choose>
+						<c:set var="isFileExist" value="${files.fileSize }" />
+						<c:if test="${isFileExist ne 0 }">
+							<input type="hidden" name="fileName" value="${files.fileName }" />
+
+							<a style="display: block;" class="post-file" href="#" onClick="downloadFile('<c:out value="${files.extendedName }" />')">
+								<span>${files.fileName }</span>
+								<span class="postFileSize" style="color: darkgray;">[${files.fileSize } byte]</span>	
+							</a>
+						</c:if>
 					</c:forEach>
 				</div>
 			</div>
@@ -60,9 +66,9 @@
 			<div style="display: flex; position: relative;">
 				<button class="to-list-btn" type="button" onClick="location.href='boardList.do'">목록</button>				
 				<div class="option-btns">
-					<input style="width: 250px; height: 35px; padding-left: 10px; border: 1px solid rgb(0, 0, 0, 0.1);" type="password" id="passwordCheck" placeholder="비밀번호" />
+					<input style="width: 250px; height: 35px; padding-left: 10px; border: 1px solid rgb(0, 0, 0, 0.1);" name="originPw" type="password" id="passwordCheck" placeholder="비밀번호" />
 					<button class="to-update-btn" type="button" onClick="updateFormBtn()">수정</button>
-					<button class="to-delete-btn" type="button" onClick="deleteFormBtn('<c:out value="${answerInfo.password }" />')">삭제</button>
+					<button class="to-delete-btn" type="button" onClick="deleteFormBtn()">삭제</button>
 				</div>
 			</div>
 		</form>

@@ -9,7 +9,8 @@ public class BoardVO {
 	private String content;
 	private String date;
 	private String view;
-	private int isAnswered;
+	private int isAnswer;
+	private int parentNo;
 	
 	private int pageSize;
 	private int offset;
@@ -98,11 +99,29 @@ public class BoardVO {
 	public void setView(String view) {
 		this.view = view;
 	}
+<<<<<<< HEAD
 	public int getIsAnswered() {
 		return isAnswered;
+=======
+	
+	@Override
+	public String toString() {
+		return "BoardVO [no=" + no + ", writer=" + writer + ", password=" + password + ", title=" + title + ", content="
+				+ content + ", date=" + date + ", view=" + view + ", pageSize=" + pageSize
+				+ ", offset=" + offset + "]";
 	}
-	public void setIsAnswered(int isAnswered) {
-		this.isAnswered = isAnswered;
+	public int getIsAnswer() {
+		return isAnswer;
+>>>>>>> branch 'main' of https://github.com/SeoYeongHoon/egov_prac.git
+	}
+	public void setIsAnswer(int isAnswer) {
+		this.isAnswer = isAnswer;
+	}
+	public int getParentNo() {
+		return parentNo;
+	}
+	public void setParentNo(int parentNo) {
+		this.parentNo = parentNo;
 	}
 	public int getAnswerNo() {
 		return answerNo;

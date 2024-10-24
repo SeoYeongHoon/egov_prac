@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import egovframework.example.board.service.AnswerVO;
@@ -19,6 +20,8 @@ public class BoardServiceImpl implements BoardService {
 	
 	@Resource(name = "boardMapper")
 	private BoardMapper boardMapper;
+	
+	BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	// 글 목록
 //	@Override
@@ -28,9 +31,9 @@ public class BoardServiceImpl implements BoardService {
 	
 	@Override
 	public List<BoardVO> selectBoardList(BoardSearchVO searchVO) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("pageSize", searchVO.getPageSize());
-		params.put("offset", searchVO.getFirstIndex());
+//		Map<String, Object> params = new HashMap<>();
+//		params.put("pageSize", searchVO.getPageSize());
+//		params.put("offset", searchVO.getFirstIndex());
 		
 		return boardMapper.selectBoardList(searchVO);
 	}
@@ -62,6 +65,10 @@ public class BoardServiceImpl implements BoardService {
 	// 글 작성
 	@Override
 	public void insertBoard(BoardVO vo) throws Exception {
+		String originPw = vo.getPassword();
+		String encodedPw = passwordEncoder.encode(originPw);
+		
+		vo.setPassword(encodedPw);
 		boardMapper.insertBoard(vo);
 	}
 
@@ -100,6 +107,12 @@ public class BoardServiceImpl implements BoardService {
 	public void deletePost(int no) throws Exception {
 		boardMapper.deletePost(no);
 	}
+	
+	// 답변글 삭제
+	@Override
+	public void deleteAnswer(int answerNo) throws Exception {
+		boardMapper.deleteAnswer(answerNo);
+	}
 
 	// 글 조회수 증가
 	@Override
@@ -123,6 +136,11 @@ public class BoardServiceImpl implements BoardService {
 	// 답변글 작성
 	@Override
 	public void insertAnswer(AnswerVO answerVO) throws Exception {
+		String originPw = answerVO.getPassword();
+		String encodedPw = passwordEncoder.encode(originPw);
+		
+		answerVO.setPassword(encodedPw);
+		
 		boardMapper.insertAnswer(answerVO);	
 	}
 
@@ -153,5 +171,12 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public FileVO getFileInfo(int fileNo) throws Exception {
 		return boardMapper.getFileInfo(fileNo);
+	}
+
+	// 답변글 수정
+	@Override
+	public void updateAnswer(AnswerVO answerVO) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -16,8 +16,8 @@
 	}
 
 	// 수정 기능
-	function updateFormBtn(pw) {
-		let pwCheck = document.querySelector('#passwordCheck');
+	function updateFormBtn() {
+		/* let pwCheck = document.querySelector('#passwordCheck');
 		
 		if (pwCheck.value === pw) {
 			document.boardInfoForm.action = "<c:url value='boardUpdatePage.do' />";
@@ -26,23 +26,17 @@
 			alert("잘못된 비밀번호");
 			pwCheck.value = '';
 			pwCheck.focus();
-		}
+		} */
+		
+		
+		document.boardInfoForm.action = "<c:url value='boardUpdatePage.do' />";
+		document.boardInfoForm.submit();
 	}
 	
 	// 삭제 기능
 	function deleteFormBtn(pw) {
-		let pwCheck = document.querySelector('#passwordCheck');
-		
-		if (pwCheck.value === pw) {
-			if (confirm("삭제하시겠습니까?")) {
-				document.boardInfoForm.action = "<c:url value='boardDelete.do' />";
-				document.boardInfoForm.submit();				
-			}
-		} else {
-			alert("잘못된 비밀번호");
-			pwCheck.value = '';
-			pwCheck.focus();
-		}
+		document.boardInfoForm.action = "<c:url value='boardDelete.do' />";
+		document.boardInfoForm.submit();
 	}
 	
 	// 답변 이동
@@ -52,7 +46,7 @@
 	}
 	
 	// 1000단위 콤마
-	function addCommas() {
+	/* function addCommas() {
 		let fileSize = document.querySelector(".postFileSize").innerText;
 		if (fileSize != null) {
 			return fileSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");			
@@ -61,7 +55,7 @@
 	
 	window.onload = function() {
 		addCommas();
-	}
+	} */
 	
 </script>
 <body>
@@ -84,6 +78,7 @@
 			
 			<!-- 첨부파일 -->
 			<div class="post-file-container" style="display: flex;">
+<<<<<<< HEAD
 			    <span style="margin-right: 30px;">첨부파일</span>
 			    <div>
 			        <c:if test="${empty fileInfo}">
@@ -104,6 +99,22 @@
 			            </c:choose>
 			        </c:forEach>
 			    </div>
+=======
+				<span style="margin-right: 30px;">첨부파일</span>
+				<div>
+					<c:forEach var="files" items="${fileInfo}" varStatus="status">
+						<c:set var="isFileExist" value="${files.fileSize }" />
+						<c:if test="${isFileExist ne 0 }">
+							<input type="hidden" name="fileName" value="${files.fileName }" />
+
+							<a style="display: block;" class="post-file" href="#" onClick="downloadFile('<c:out value="${files.extendedName }" />')">
+								<span>${files.fileName }</span>
+								<span class="postFileSize" style="color: darkgray;">[${files.fileSize } byte]</span>	
+							</a>
+						</c:if>
+					</c:forEach>
+				</div>
+>>>>>>> branch 'main' of https://github.com/SeoYeongHoon/egov_prac.git
 			</div>
 
 		
@@ -111,8 +122,8 @@
 			<div style="display: flex; position: relative;">
 				<button class="to-list-btn" type="button" onClick="location.href='boardList.do'">목록</button>				
 				<div class="option-btns">
-					<input style="width: 250px; height: 35px; padding-left: 10px; border: 1px solid rgb(0, 0, 0, 0.1);" type="password" id="passwordCheck" placeholder="비밀번호" />
-					<button class="to-update-btn" type="button" onClick="updateFormBtn('<c:out value="${boardInfo.password }" />')">수정</button>
+					<input style="width: 250px; height: 35px; padding-left: 10px; border: 1px solid rgb(0, 0, 0, 0.1);" name="originPw" type="password" id="passwordCheck" placeholder="비밀번호" />
+					<button class="to-update-btn" type="button" onClick="updateFormBtn()">수정</button>
 					<button class="to-delete-btn" type="button" onClick="deleteFormBtn('<c:out value="${boardInfo.password }" />')">삭제</button>
 					<button class="to-answer-btn" type="button" onClick="answerFormBtn('<c:out value="${boardInfo.no }" />')">답변등록</button>
 				</div>
