@@ -11,7 +11,7 @@ public class BoardSearchVO {
     private int lastIndex;           // 마지막 게시물 인덱스
     private int recordCountPerPage;  // 한 페이지에 표시할 게시물 수
     
-    private int isAnswered;
+    private int isAnswer;
 
     public String getSearchKeyword() {
         return searchKeyword;
@@ -78,11 +78,11 @@ public class BoardSearchVO {
     }
 
 	public int getIsAnswered() {
-		return isAnswered;
+		return isAnswer;
 	}
 
-	public void setIsAnswered(int isAnswered) {
-		this.isAnswered = isAnswered;
+	public void setIsAnswered(int isAnswer) {
+		this.isAnswer = isAnswer;
 	}
 }
 

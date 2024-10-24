@@ -9,7 +9,8 @@ public class BoardVO {
 	private String content;
 	private String date;
 	private String view;
-	private int isAnswered;
+	private int isAnswer;
+	private int parentNo;
 	
 	private int pageSize;
 	private int offset;
@@ -75,10 +76,16 @@ public class BoardVO {
 				+ content + ", date=" + date + ", view=" + view + ", pageSize=" + pageSize
 				+ ", offset=" + offset + "]";
 	}
-	public int getIsAnswered() {
-		return isAnswered;
+	public int getIsAnswer() {
+		return isAnswer;
 	}
-	public void setIsAnswered(int isAnswered) {
-		this.isAnswered = isAnswered;
+	public void setIsAnswer(int isAnswer) {
+		this.isAnswer = isAnswer;
+	}
+	public int getParentNo() {
+		return parentNo;
+	}
+	public void setParentNo(int parentNo) {
+		this.parentNo = parentNo;
 	}
 }

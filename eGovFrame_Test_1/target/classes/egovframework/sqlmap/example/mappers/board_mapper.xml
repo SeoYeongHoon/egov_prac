@@ -11,7 +11,7 @@
 	<!-- 글 목록 -->
 	<select id="selectBoardList" parameterType="searchVO" resultType="boardVO">
 		SELECT *
-		FROM board_write <!-- bw left join board_answer ba on bw.no = ba.no -->
+		FROM board_write
 		WHERE 1=1
 		<if test="searchKeyword != null and searchKeyword != ''">
 			<choose>
@@ -24,7 +24,7 @@
 			</choose>
 		</if>
 		ORDER BY no DESC
-		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+		LIMIT #{recordCountPerPage}  OFFSET #{firstIndex}
 	</select>		
 	
 	<!-- 글 개수 -->
@@ -118,6 +118,15 @@
 		WHERE no = #{no}
 	</update>
 	
+	<!-- 답변글 수정 -->
+	<update id="updateAnswer">
+		UPDATE board_answer
+		SET writer = #{writer},
+			title = #{title},
+		    content = #{content}
+		WHERE answerno = #{answerNo}
+	</update>
+	
 	<!-- 첨부파일 수정 -->
 	<update id="updateFiles" parameterType="fileVO">
 		UPDATE files
@@ -148,6 +157,12 @@
 	<delete id="deletePost" parameterType="int">
 		DELETE FROM board_write
 		WHERE no = #{no}
+	</delete>
+	
+	<!-- 답변글 삭제 -->
+	<delete id="deleteAnswer" parameterType="int">
+		DELETE FROM board_answer
+		WHERE answerno = #{answerNo}
 	</delete>
 	
 	<!-- 조회수 증가 -->
@@ -205,7 +220,7 @@
 	<!-- 답변 작성 시 게시글 상태변화 -->
 	<update id="updateAnswerStatus" parameterType="int">
 		UPDATE board_write
-		SET isanswered = 1
+		SET isanswer = 1
 		WHERE no = #{no}
 	</update>
 	

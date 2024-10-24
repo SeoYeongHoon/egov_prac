@@ -31,6 +31,9 @@ public interface BoardService {
 	
 	// 글 수정
 	void updateBoard(BoardVO vo) throws Exception;
+	
+	// 답변글 수정
+	void updateAnswer(AnswerVO answerVO) throws Exception;
 
 	// 첨부파일 수정
 	void updateFiles(FileVO fileVO) throws Exception;
@@ -40,6 +43,9 @@ public interface BoardService {
 	
 	// 글 삭제
 	void deletePost(int no) throws Exception;
+	
+	// 답변글 삭제
+	void deleteAnswer(int answerNo) throws Exception;
 
 	// 글 조회수 증가
 	int updateView(int no) throws Exception;
