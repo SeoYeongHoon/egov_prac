@@ -98,8 +98,8 @@ public class BoardServiceImpl implements BoardService {
 
 	// 첨부파일 삭제
 	@Override
-	public void deleteFile(int fileNo) throws Exception {
-		boardMapper.deleteFile(fileNo);
+	public void deleteFiles(int fileNo) throws Exception {
+		boardMapper.deleteFiles(fileNo);
 	}
 
 	// 글 삭제

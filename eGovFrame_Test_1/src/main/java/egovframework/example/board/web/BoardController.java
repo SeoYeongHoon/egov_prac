@@ -130,39 +130,6 @@ public class BoardController {
 	        // 파일 저장 경로
 	        String filePath = "D:\\upload\\" + extendedName;
 
-<<<<<<< HEAD
-		boardService.insertBoard(vo);
-		
-		List<Map<String, String>> fileList = new ArrayList<>();
-				
-		for (int i = 0; i < multipartFiles.size(); i++) {
-			String extendedName = null;
-			Long fileSize = null;
-			
-			String originName = multipartFiles.get(i).getOriginalFilename();
-			String extentionName = FilenameUtils.getExtension(originName);
-			UUID uuid = UUID.randomUUID();
-			extendedName = uuid + "." + extentionName;
-			fileSize = multipartFiles.get(i).getSize();
-			
-			extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
-			// originName = URLEncoder.encode(originName, "UTF-8");
-			
-			Map<String, String> map = new HashMap<>();
-			map.put("originName", originName);
-			map.put("extendedName", extendedName);
-			
-			fileList.add(map);
-			
-			fileVO.setFileName(originName);
-			fileVO.setExtendedName(extendedName);
-			fileVO.setFileSize(fileSize);
-			fileVO.setNo(vo.getNo());
-			
-			boardService.insertFiles(fileVO);
-			
-			multipartFiles.get(i).transferTo(new File("D:\\upload\\" + fileList.get(i).get("extendedName")));
-=======
 	        // FileVO 인스턴스 생성
 	        // FileVO fileVO = new FileVO();
 	        fileVO.setFileName(originName);
@@ -181,7 +148,6 @@ public class BoardController {
 	            e.printStackTrace();
 	            // 필요시 특정 페이지로 리다이렉트할 수 있음
 	        }
->>>>>>> branch 'main' of https://github.com/SeoYeongHoon/egov_prac.git
 		
 		}
 		
@@ -393,55 +359,6 @@ public class BoardController {
 	
 	// 글 수정 기능
 	@RequestMapping(value = "/boardUpdate.do", method = RequestMethod.POST)
-<<<<<<< HEAD
-	public String updatePost(BoardVO vo, 
-	                         @RequestParam(value = "fileId", required = false) List<Integer> fileNo,
-	                         @RequestParam("multiFile") List<MultipartFile> multipartFiles) throws Exception {
-	    
-	    // 게시판 글 수정
-	    boardService.updateBoard(vo);
-	    
-	    if (multipartFiles.isEmpty()) {
-	        return "redirect:boardList.do"; // 파일이 없으면 바로 목록으로 리다이렉트
-	    }
-	    
-	    for (MultipartFile multipartFile : multipartFiles) {
-	        if (multipartFile.isEmpty()) {
-	            continue; // 비어있는 파일은 무시
-	        }
-	        
-	        // 파일 정보 설정
-	        String originName = multipartFile.getOriginalFilename();
-	        String extensionName = FilenameUtils.getExtension(originName);
-	        UUID uuid = UUID.randomUUID();
-	        String extendedName = uuid + "." + extensionName;
-	        Long fileSize = multipartFile.getSize();
-	        
-	        // 파일 저장 경로
-	        String filePath = "D:\\upload\\" + extendedName;
-
-	        // FileVO 인스턴스 생성
-	        FileVO fileVO = new FileVO();
-	        fileVO.setFileName(originName);
-	        fileVO.setExtendedName(extendedName);
-	        fileVO.setFileSize(fileSize);
-	        fileVO.setNo(vo.getNo());
-	        
-	        // DB에 파일 정보 저장
-	        boardService.insertFiles(fileVO);
-	        
-	        // 파일 저장
-	        try {
-	            multipartFile.transferTo(new File(filePath));
-	        } catch (IOException e) {
-	            // 예외 처리 (예: 로그 기록, 사용자에게 오류 메시지 표시 등)
-	            e.printStackTrace();
-	            // 필요시 특정 페이지로 리다이렉트할 수 있음
-	        }
-	    }
-	    
-	    return "redirect:boardList.do";
-=======
 	public String updatePost(BoardVO vo,
 							 @RequestParam("no") int no, 
 							 @RequestParam("originPw") String pw,
@@ -504,7 +421,6 @@ public class BoardController {
 		} else {
 			return "redirect:boardList.do";
 		}
->>>>>>> branch 'main' of https://github.com/SeoYeongHoon/egov_prac.git
 	}
 
 	
@@ -545,7 +461,6 @@ public class BoardController {
 	// 파일 다운로드
 	@RequestMapping(value = "/fileDownload.do")
 	public void fileDownload(HttpServletRequest req, HttpServletResponse res) throws Exception {
-<<<<<<< HEAD
 	    
 	    // boardInfo.jsp에서 데이터 이름 가져오기
 	    String extendedName = req.getParameter("extendedName"); // upload할 때 변경된 파일 이름
@@ -570,27 +485,6 @@ public class BoardController {
 	    // 여기서부터 주석 필요
 	    // 파일을 읽기 위한 FileInputStream 생성
 	    FileInputStream fileInputStream = new FileInputStream(downPathFrom);
-=======
-		
-		// boardInfo.jsp에서 데이터 이름 가져오기
-		String extendedName = req.getParameter("extendedName"); // upload할 때 변경된 파일 이름
-		
-		FileVO fileVO = boardService.selectOriginalName(extendedName);
-		String realName = fileVO.getFileName();
-		System.out.println("파일이름: " + realName);
-		
-		// 파일 있는 경로
-		String downPathFrom = "D:\\upload\\" + extendedName;
-		
-		// 에서 추출
-		File file = new File(downPathFrom);
-		if (!file.exists()) {
-			return;
-		}
-		
-		// 여기서부터 주석 필요
-		FileInputStream fileInputStream = new FileInputStream(downPathFrom);
->>>>>>> branch 'main' of https://github.com/SeoYeongHoon/egov_prac.git
 
 	    // 파일 이름 인코딩 처리 (한글 파일명 지원)
 	    extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
@@ -620,24 +514,4 @@ public class BoardController {
 	    outputStream.close(); // OutputStream 닫기
 	    fileInputStream.close(); // FileInputStream 닫기
 	}
-<<<<<<< HEAD
-
-	
-	
-	// 글 조회수 기능
-	public int postView(int no) throws Exception {
-		return boardService.updateView(no);
-	}
-	
-	// 답변글 조회수 기능
-	public int answerView(int no) throws Exception {
-		return boardService.updateAnswerView(no);
-	}
-	
-	// 첨부파일 삭제 기능
-	public void deleteFile(int fileNo) throws Exception {
-		boardService.deleteFile(fileNo);
-	}
-=======
->>>>>>> branch 'main' of https://github.com/SeoYeongHoon/egov_prac.git
 }

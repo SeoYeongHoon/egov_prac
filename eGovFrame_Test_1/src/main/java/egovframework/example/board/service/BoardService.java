@@ -42,7 +42,7 @@ public interface BoardService {
 	void updateFiles(FileVO fileVO) throws Exception;
 	
 	// 첨부파일 삭제
-	void deleteFile(int fileNo) throws Exception;
+	void deleteFiles(int fileNo) throws Exception;
 	
 	// 글 삭제
 	void deletePost(int no) throws Exception;
