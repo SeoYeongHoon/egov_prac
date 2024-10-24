@@ -5,6 +5,7 @@ import java.util.List;
 import egovframework.example.board.service.AnswerVO;
 import egovframework.example.board.service.BoardSearchVO;
 import egovframework.example.board.service.BoardVO;
+import egovframework.example.board.service.BoardsVO;
 import egovframework.example.board.service.FileVO;
 import egovframework.rte.psl.dataaccess.mapper.Mapper;
 
@@ -14,6 +15,8 @@ public interface BoardMapper {
 	// 글 목록
 //	List<?> selectBoardList(BoardSearchVO searchVO) throws Exception;
 	List<BoardVO> selectBoardList(BoardSearchVO searchVO) throws Exception;
+	
+	List<BoardsVO> selectBoardLists(BoardSearchVO searchVO) throws Exception;
 	
 	// 글 개수
 	int selectBoardCount(BoardSearchVO boardSearchVO) throws Exception;

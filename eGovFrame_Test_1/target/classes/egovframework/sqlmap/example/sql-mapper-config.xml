@@ -9,5 +9,6 @@
 		<typeAlias alias="searchVO" type="egovframework.example.board.service.BoardSearchVO"/>
 		<typeAlias alias="pagingVO" type="egovframework.example.board.service.PagingVO"/>
 		<typeAlias alias="answerVO" type="egovframework.example.board.service.AnswerVO"/>
+		<typeAlias alias="boardsVO" type="egovframework.example.board.service.BoardsVO"/>
     </typeAliases>
 </configuration>

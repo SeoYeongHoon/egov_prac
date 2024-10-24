@@ -25,7 +25,29 @@
 		</if>
 		ORDER BY no DESC
 		LIMIT #{recordCountPerPage}  OFFSET #{firstIndex}
-	</select>		
+	</select>
+	
+	<select id="selectBoardLists" parameterType="searchVO" resultType="boardsVO">
+	    SELECT *
+	    FROM board
+	    WHERE 1=1
+	    <if test="searchKeyword != null and searchKeyword != ''">
+	        <choose>
+	            <when test="searchCondition == 1">
+	                AND writer LIKE CONCAT('%', #{searchKeyword}, '%')
+	            </when>
+	            <when test="searchCondition == 0">
+	                AND title LIKE CONCAT('%', #{searchKeyword}, '%')
+	            </when>
+	        </choose>
+	    </if>
+	    ORDER BY CASE 
+	                 WHEN parent_id IS NULL THEN id 
+	                 ELSE parent_id 
+	             END DESC,
+	             parent_id IS NOT NULL, id ASC
+	    LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
 	
 	<!-- 글 개수 -->
 	<select id="selectBoardCount" parameterType="searchVO" resultType="int">

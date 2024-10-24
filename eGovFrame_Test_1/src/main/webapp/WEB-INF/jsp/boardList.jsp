@@ -107,14 +107,7 @@ crossorigin="anonymous">
 		<!-- 전체 게시글 수 -->
 		<div class="total-posts">
 			<p style="margin-bottom: 5px;">전체: &nbsp<span style="color: red; font-weight: bold;">${paginationInfo.totalRecordCount }</span>건</p>		
-		</div>
-		
-		<!-- 게시판 리스트 폼 -->
-		<%-- <form id="boardListForm" name="boardListForm" method="POST">
-		    <input type="hidden" name="pageIndex" value="1">
-		    <input type="hidden" name="pageSize" value="10">  <!-- 한 페이지당 게시글 수 -->
-		</form> --%>
-		
+		</div>		
 		
 		<!-- 목록 구역 -->
 		<form id="boardListForm" name="boardListForm" method="POST">
@@ -133,33 +126,24 @@ crossorigin="anonymous">
 		            </thead>
 		            <tbody id="listBodyArea">
 		                <c:forEach var="list" items="${boardList}" varStatus="status">
-	                    	<input type="hidden" value="${list.isAnswer }" />
 		                    <tr>
 		                        <td style="text-align: center;">
-		                            <c:out value="${paginationInfo.totalRecordCount+1 - ((searchVO.pageIndex-1) * searchVO.pageSize + status.count)}"/>
+		                            <c:out value="${paginationInfo.totalRecordCount + 1 - ((searchVO.pageIndex - 1) * searchVO.pageSize + status.count)}" />
 		                        </td>
-		                        <td class="info-select" onClick="selectBoardInfo('<c:out value="${list.no }" />')">
-		                            <c:out value="${list.title }"/>
+		                        <td class="info-select" onClick="selectBoardInfo('<c:out value="${list.id}" />')">
+		                            <c:choose>
+		                                <c:when test="${list.type eq 'answer'}">
+		                                    ㄴ &nbsp;<c:out value="${list.title}" />
+		                                </c:when>
+		                                <c:otherwise>
+		                                    <c:out value="${list.title}" />
+		                                </c:otherwise>
+		                            </c:choose>
 		                        </td>
-		                        <td style="text-align: center;"><c:out value="${list.writer }"/></td>
-		                        <td style="text-align: center;"><c:out value="${list.date }"/></td>
-		                        <td style="text-align: center;"><c:out value="${list.view }"/></td>
+		                        <td style="text-align: center;"><c:out value="${list.writer}" /></td>
+		                        <td style="text-align: center;"><c:out value="${list.date}" /></td>
+		                        <td style="text-align: center;"><c:out value="${list.view}" /></td>
 		                    </tr>
-		                    
-		                    <c:set var="isAnswer" value="${list.isAnswer }" />
-		                    <c:forEach var="answer" items="${answerList }" varStatus="status">
-		                    	<c:if test="${isAnswer eq 1 and list.no eq answer.no}">
-		                            <tr style="background-color: aliceblue;">
-		                                <td style="text-align: center">[답변]</td>
-		                                <td class="info-select" onClick="selectAnswerInfo('<c:out value="${answer.answerNo }" />')">
-											ㄴ &nbsp<c:out value="${answer.title }"/>
-		                                </td>
-		                                <td style="text-align: center;"><c:out value="${answer.writer }"/></td>
-		                                <td style="text-align: center;"><c:out value="${answer.date }"/></td>
-		                                <td style="text-align: center;"><c:out value="${answer.view }"/></td>
-		                            </tr>
-		                        </c:if>
-		                    </c:forEach>
 		                </c:forEach>
 		            </tbody>
 		        </table>

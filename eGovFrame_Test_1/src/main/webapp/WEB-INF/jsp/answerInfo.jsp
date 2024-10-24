@@ -14,17 +14,6 @@
 		document.boardInfoForm.action = "<c:url value='fileDownload.do?extendedName=" + exName + "' />";
 		document.boardInfoForm.submit();
 	}
-	
-	function updateFormBtn() {		
-		document.boardInfoForm.action = "<c:url value='answerUpdatePage.do' />";
-		document.boardInfoForm.submit();
-	}
-	
-	// 삭제 기능
-	function deleteFormBtn() {
-		document.boardInfoForm.action = "<c:url value='answerDelete.do' />";
-		document.boardInfoForm.submit();
-	}
 </script>
 <body>
 	<div id="boardInfo">
@@ -73,5 +62,37 @@
 			</div>
 		</form>
 	</div>
+	
+	<!-- 비밀번호 틀렸을 경우 alert창 띄우기 -->
+	<c:if test="${not empty errorMsg}">
+	    <script>
+	        alert("${errorMsg}");
+	    </script>
+	</c:if>
 </body>
+<script>
+	function updateFormBtn() {
+	    var password = document.getElementById('passwordCheck').value;
+	    if (password === '') {
+	        alert('비밀번호를 입력하세요.');
+	        return;
+	    }
+	    // 비밀번호를 POST 방식으로 전송하여 수정 페이지로 이동
+	    var form = document.getElementById('boardInfoForm');
+	    form.action = 'answerUpdatePage.do';  // 수정 페이지로 POST 요청
+	    form.submit();
+	}
+	
+	function deleteFormBtn() {
+        var password = document.getElementById('passwordCheck').value;
+        if (password === '') {
+            alert('비밀번호를 입력하세요.');
+            return;
+        }
+        // 비밀번호를 POST 방식으로 전송하여 삭제 처리
+        var form = document.getElementById('boardInfoForm');
+        form.action = 'answerDelete.do';  // 삭제 요청
+        form.submit();
+    }
+</script>
 </html>

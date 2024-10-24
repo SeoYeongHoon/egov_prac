@@ -1,21 +1,11 @@
 package egovframework.example.board.web;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +20,7 @@ import egovframework.example.board.service.AnswerVO;
 import egovframework.example.board.service.BoardSearchVO;
 import egovframework.example.board.service.BoardService;
 import egovframework.example.board.service.BoardVO;
+import egovframework.example.board.service.BoardsVO;
 import egovframework.example.board.service.FileVO;
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
@@ -77,23 +68,25 @@ public class BoardController {
 	    searchVO.setLastIndex(paginationInfo.getLastRecordIndex());
 	    searchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
 
-	    
-	    // 게시글 목록 조회
-	    List<BoardVO> boardList = boardService.selectBoardList(searchVO);
-	    List<AnswerVO> answerList = boardService.selectAnswer();
-	    
+	    // 게시글 목록 조회 (답변 포함)
+	    List<BoardsVO> boardList = boardService.selectBoardListWithAnswers(searchVO);
+
 	    // 전체 게시글 수 조회
 	    int totalCnt = boardService.selectBoardCount(searchVO);
 	    paginationInfo.setTotalRecordCount(totalCnt); // 전체 게시글 수 설정
-	   
+
 	    model.addAttribute("paginationInfo", paginationInfo);
 	    model.addAttribute("boardList", boardList);
-	    model.addAttribute("answerList", answerList);
 
 	    return "boardList";
 	}
 
 	
+	/* 
+	 * 
+	 * 게시글 
+	 *  
+	 *  */ 
 	// 글 쓰기 페이지이동
 	@RequestMapping(value = "/boardPost.do")
 	public String addPostPage() {
@@ -102,54 +95,106 @@ public class BoardController {
 	
 	// 글 쓰기 기능
 	@RequestMapping(value = "/boardPost.do", method = RequestMethod.POST)
-	public String addPost(@ModelAttribute("vo") BoardVO vo,
-						  @ModelAttribute("fileVO") FileVO fileVO,
-						  @RequestParam("multiFile") List<MultipartFile> multipartFiles
-						 ) throws Exception {
-		
-		boardService.insertBoard(vo);	
-		
-		for (MultipartFile multipartFile : multipartFiles) {
-	        if (multipartFile.isEmpty()) {
-	        	// 파일 추가가 없을 땐 밑 로직 생략 
-	        	System.out.println("추가되거나 삭제된 파일이 없음 \t");
-	            continue;
-	        }
-	        
-	        // 파일 정보 설정
-	        String originName = multipartFile.getOriginalFilename();
-	        String extensionName = FilenameUtils.getExtension(originName);
-	        UUID uuid = UUID.randomUUID();
-	        String extendedName = uuid + "." + extensionName;
-	        Long fileSize = multipartFile.getSize();
-	        
-	        // 파일 저장 경로
-	        String filePath = "D:\\upload\\" + extendedName;
+    public String addPost(@ModelAttribute("vo") BoardVO vo,
+                          @RequestParam("multiFile") List<MultipartFile> multipartFiles) throws Exception {
 
-	        // FileVO 인스턴스 생성
-	        // FileVO fileVO = new FileVO();
-	        fileVO.setFileName(originName);
-	        fileVO.setExtendedName(extendedName);
-	        fileVO.setFileSize(fileSize);
-	        fileVO.setNo(vo.getNo());
-	        
-	        // DB에 파일 정보 저장
-	        boardService.insertFiles(fileVO);
-	        
-	        // 파일 저장
-	        try {
-	            multipartFile.transferTo(new File(filePath));
-	        } catch (IOException e) {
-	            // 예외 처리 (예: 로그 기록, 사용자에게 오류 메시지 표시 등)
-	            e.printStackTrace();
-	            // 필요시 특정 페이지로 리다이렉트할 수 있음
-	        }
+        boardService.insertBoardWithFiles(vo, multipartFiles);
+        
+        return "redirect:boardList.do";
+    }
+	
+	// 글 단건 조회
+	@RequestMapping(value = "/boardInfo.do")
+	public String boardInfo(@RequestParam("selectedBoardId") int boardId, Model model) throws Exception {
+		boardService.updateView(boardId); // 조회수 증가
+		BoardVO boardVO = boardService.selectBoardInfo(boardId);
+		List<FileVO> fileVO = boardService.selectFilesInfo(boardId);
 		
-		}
+		model.addAttribute("boardInfo", boardVO);
+		model.addAttribute("fileInfo", fileVO);
 		
-		return "redirect:boardList.do";
+		return "boardInfo";
 	}
 	
+	// 글 수정 페이지이동
+	@RequestMapping(value = "/boardUpdatePage.do")
+	public String updatePostPage(@RequestParam("no") int no, 
+								 @RequestParam("originPw") String pw,
+								 Model model) throws Exception {
+		
+		BoardVO boardVO = boardService.selectBoardInfo(no);
+		List<FileVO> fileVO = boardService.selectFilesInfo(no);
+		Boolean isPwCorrect = passwordEncoder.matches(pw, boardVO.getPassword());
+		
+		if (isPwCorrect) {
+			model.addAttribute("boardInfo", boardVO);
+			model.addAttribute("fileInfo", fileVO);
+			
+			return "boardUpdate";
+		} else {
+			model.addAttribute("boardInfo", boardVO);
+			model.addAttribute("fileInfo", fileVO);
+	        model.addAttribute("errorMsg", "비밀번호를 확인하세요.");
+	        
+	        return "boardInfo";
+		}
+	}
+	
+	// 글 수정 기능
+	@RequestMapping(value = "/boardUpdate.do", method = RequestMethod.POST)
+	public String updatePost(BoardVO vo,
+	                         @RequestParam("no") int no,
+	                         @RequestParam("originPw") String pw,
+	                         @RequestParam(value = "multiFile", required = false) List<MultipartFile> multipartFiles,
+	                         @RequestParam(value = "deletedFileNo", required = false) List<Integer> deleteNo,
+	                         Model model
+							 ) throws Exception {
+	    
+	    boolean isUpdated = boardService.updatePostWithFiles(vo, no, pw, multipartFiles, deleteNo);
+	    // BoardVO boardVO = boardService.selectBoardInfo(no);
+		List<FileVO> fileVO = boardService.selectFilesInfo(no);
+		
+	    // 수정이 성공했으면 목록으로 이동, 실패 시 원래 페이지로 리다이렉트
+	    if (!isUpdated) {
+	    	model.addAttribute("boardInfo", vo);
+			model.addAttribute("fileInfo", fileVO);
+	        model.addAttribute("errorMsg", "비밀번호가 틀렸습니다.");
+	        return "boardUpdate";
+	    }
+
+	    return "redirect:/boardList.do";
+	}
+
+	
+	// 글 삭제 기능
+	@RequestMapping(value = "/boardDelete.do")
+	public String deleteBoard(@RequestParam("no") int no,
+							  @RequestParam("originPw") String pw,
+							  Model model) throws Exception {
+		
+		BoardVO boardVO = boardService.selectBoardInfo(no);
+		List<FileVO> fileVO = boardService.selectFilesInfo(no);
+		Boolean isPwCorrect = passwordEncoder.matches(pw, boardVO.getPassword());
+		
+		if (isPwCorrect) {
+			boardService.deletePost(no);
+			
+			return "redirect:boardList.do";
+		} else {
+			model.addAttribute("boardInfo", boardVO);
+			model.addAttribute("fileInfo", fileVO);
+	        model.addAttribute("errorMsg", "비밀번호를 확인하세요.");
+	        
+	        return "boardInfo";
+		}
+	}
+	
+	
+	/* 
+	 * 
+	 * 답변글
+	 *  
+	 *  */ 
 	// 답변 글 작성 페이지 이동
 	@RequestMapping(value = "/boardAnswerPage.do")
 	public String answerPage(@RequestParam("no") int no, Model model) throws Exception {
@@ -163,72 +208,18 @@ public class BoardController {
 	// 답변 글 작성 기능
 	@RequestMapping(value = "/answerPost.do", method = RequestMethod.POST)
 	public String addAnswerPost(@ModelAttribute("answerVO") AnswerVO answerVO,
-								@ModelAttribute("vo") BoardVO vo,
-							    @ModelAttribute("fileVO") FileVO fileVO,
-							    @RequestParam("no") int no,
-							    @RequestParam("multiFile") List<MultipartFile> multipartFiles
-							    ) throws Exception {
-		
-		boardService.insertAnswer(answerVO);
-		boardService.updateAnswerStatus(no);
-		
-		List<Map<String, String>> fileList = new ArrayList<>();
-		
-		System.out.println("파일들: " + multipartFiles);
-		
-		
-		for (int i = 0; i < multipartFiles.size(); i++) {
-			String extendedName = null;
-			Long fileSize = null;
-			
-			String originName = multipartFiles.get(i).getOriginalFilename();
-			String extentionName = FilenameUtils.getExtension(originName);
-			UUID uuid = UUID.randomUUID();
-			extendedName = uuid + "." + extentionName;
-			fileSize = multipartFiles.get(i).getSize();
-			
-			extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
-			// originName = URLEncoder.encode(originName, "UTF-8");
-			
-			Map<String, String> map = new HashMap<>();
-			map.put("originName", originName);
-			map.put("extendedName", extendedName);
-			
-			fileList.add(map);
-			
-			fileVO.setFileName(originName);
-			fileVO.setExtendedName(extendedName);
-			fileVO.setFileSize(fileSize);
-			fileVO.setAnswerNo(answerVO.getAnswerNo());
-			
-			boardService.insertAnsweredFiles(fileVO);
-			
-			multipartFiles.get(i).transferTo(new File("D:\\upload\\" + fileList.get(i).get("extendedName")));
-		
-		}
-		
-		return "redirect:boardList.do";
-	}
-	
-	// 글 단건 조회
-	@RequestMapping(value = "/boardInfo.do")
-	public String boardInfo(@RequestParam("selectedBoardId") int boardId, Model model) throws Exception {
-		boardService.updateView(boardId); // 조회수 증가
-		BoardVO boardVO = boardService.selectBoardInfo(boardId);
-		List<FileVO> fileVO = boardService.selectFilesInfo(boardId);
-		
-		model.addAttribute("boardInfo", boardVO);
-		model.addAttribute("fileInfo", fileVO);
-		System.out.println("파일 정보: " + fileVO.toString());
-		
-		
-		return "boardInfo";
+	                            @RequestParam("no") int no,
+	                            @RequestParam("multiFile") List<MultipartFile> multipartFiles) throws Exception {
+
+	    boardService.insertAnswerWithFiles(answerVO, no, multipartFiles);
+	    
+	    return "redirect:boardList.do";
 	}
 	
 	// 답변글 단건 조회
 	@RequestMapping(value = "/answerInfo.do")
 	public String answerInfo(@RequestParam("selectedAnswerNo") int answerNo, Model model) throws Exception {
-		boardService.updateView(answerNo); // 조회수 증가
+		boardService.updateAnswerView(answerNo); // 조회수 증가
 		AnswerVO answerVO = boardService.selectAnswerInfo(answerNo);
 		List<FileVO> fileVO = boardService.selectAnswerFilesInfo(answerNo);
 		
@@ -244,213 +235,68 @@ public class BoardController {
 								   @RequestParam("originPw") String pw,
 								   Model model) throws Exception {
 		
-		AnswerVO answerVO = new AnswerVO();
-		answerVO = boardService.selectAnswerInfo(no);
+		AnswerVO answerVO = boardService.selectAnswerInfo(no);
+		List<FileVO> fileVO = boardService.selectAnswerFilesInfo(no);
 		Boolean isPwCorrect = passwordEncoder.matches(pw, answerVO.getPassword());
 		
 		if (isPwCorrect) {
-			List<FileVO> fileVO = boardService.selectAnswerFilesInfo(no);
-			
 			model.addAttribute("answerInfo", answerVO);
 			model.addAttribute("fileInfo", fileVO);
 			
 			return "answerUpdate";
 		} else {
-			return "redirect:boardList.do";
+			model.addAttribute("answerInfo", answerVO);
+			model.addAttribute("fileInfo", fileVO);
+	        model.addAttribute("errorMsg", "비밀번호를 확인하세요.");
+	        
+	        return "answerInfo";
 		}
-		
-		
 	}
 	
 	// 답변글 수정 기능
 	@RequestMapping(value = "/answerUpdate.do", method = RequestMethod.POST)
-	public String updateAnswer(BoardVO vo,
-							 @RequestParam("answerNo") int no, 
-							 @RequestParam("originPw") String pw,
-							 @RequestParam("multiFile") List<MultipartFile> multipartFiles,
-							 @RequestParam("deletedFileNo") List<Integer> deleteNo
-							 ) throws Exception {
-		
-		AnswerVO answerVO = new AnswerVO();
-		answerVO = boardService.selectAnswerInfo(no);
-		Boolean isPwCorrect = passwordEncoder.matches(pw, answerVO.getPassword());
-		
-		for (int i = 0; i < deleteNo.size(); i++) {
-			System.out.println("삭제할 번호: " + deleteNo.get(i));	
-			boardService.deleteFiles(deleteNo.get(i));
-		}
-		
-		if (isPwCorrect) {
-			boardService.updateBoard(vo);
-			
-			for (MultipartFile multipartFile : multipartFiles) {
-				System.out.println("파일 이름들: " + multipartFile.getOriginalFilename());
-				
-		        if (multipartFile.isEmpty()) {
-		        	// 파일 추가가 없을 땐 밑 로직 생략 
-		        	System.out.println("추가되된 파일이 없음 \t");
-		            continue;
-		        }
-		        
-		        // 파일 정보 설정
-		        String originName = multipartFile.getOriginalFilename();
-		        String extensionName = FilenameUtils.getExtension(originName);
-		        UUID uuid = UUID.randomUUID();
-		        String extendedName = uuid + "." + extensionName;
-		        Long fileSize = multipartFile.getSize();
-		        
-		        // 파일 저장 경로
-		        String filePath = "D:\\upload\\" + extendedName;
+	public String updateAnswer(AnswerVO vo,
+	                           @RequestParam("answerNo") int answerNo,
+	                           @RequestParam("originPw") String pw,
+	                           @RequestParam(value = "multiFile", required = false) List<MultipartFile> multipartFiles,
+	                           @RequestParam(value = "deletedFileNo", required = false) List<Integer> deleteNo,
+	                           Model model) throws Exception {
 
-		        // FileVO 인스턴스 생성
-		        FileVO fileVO = new FileVO();
-		        fileVO.setFileName(originName);
-		        fileVO.setExtendedName(extendedName);
-		        fileVO.setFileSize(fileSize);
-		        fileVO.setNo(vo.getNo());
-		        
-		        // DB에 파일 정보 저장      
-		        boardService.insertFiles(fileVO);
-		        
-		        // 파일 저장
-		        try {
-		            multipartFile.transferTo(new File(filePath));
-		        } catch (IOException e) {
-		            // 예외 처리 (예: 로그 기록, 사용자에게 오류 메시지 표시 등)
-		            e.printStackTrace();
-		            // 필요시 특정 페이지로 리다이렉트할 수 있음
-		        }
-			
-			}
-			return "redirect:boardList.do";
-		} else {
-			return "redirect:boardList.do";
-		}
-	}
-	
-	// 글 수정 페이지이동
-	@RequestMapping(value = "/boardUpdatePage.do")
-	public String updatePostPage(@RequestParam("no") int no, 
-								 @RequestParam("originPw") String pw,
-								 Model model) throws Exception {
-		
-		
-		BoardVO boardVO = new BoardVO();
-		boardVO = boardService.selectBoardInfo(no);
-		Boolean isPwCorrect = passwordEncoder.matches(pw, boardVO.getPassword());
-		
-		if (isPwCorrect) {
-			List<FileVO> fileVO = boardService.selectFilesInfo(no);
-			
-			model.addAttribute("boardInfo", boardVO);
+	    boolean isUpdated = boardService.updateAnswerWithFiles(vo, answerNo, pw, multipartFiles, deleteNo);
+		List<FileVO> fileVO = boardService.selectAnswerFilesInfo(answerNo);
+
+	    if (!isUpdated) {
+	    	model.addAttribute("answerInfo", vo);
 			model.addAttribute("fileInfo", fileVO);
-			
-			return "boardUpdate";
-		} else {
-			return "redirect:boardList.do";
-		}
-		
-		
-	}
-	
-	// 글 수정 기능
-	@RequestMapping(value = "/boardUpdate.do", method = RequestMethod.POST)
-	public String updatePost(BoardVO vo,
-							 @RequestParam("no") int no, 
-							 @RequestParam("originPw") String pw,
-							 @RequestParam("multiFile") List<MultipartFile> multipartFiles,
-							 @RequestParam("deletedFileNo") List<Integer> deleteNo
-							 ) throws Exception {
-		
-		BoardVO boardVO = new BoardVO();
-		boardVO = boardService.selectBoardInfo(no);
-		Boolean isPwCorrect = passwordEncoder.matches(pw, boardVO.getPassword());
-		
-		for (int i = 0; i < deleteNo.size(); i++) {
-			System.out.println("삭제할 번호: " + deleteNo.get(i));	
-			boardService.deleteFiles(deleteNo.get(i));
-		}
-		
-		if (isPwCorrect) {
-			boardService.updateBoard(vo);
-			
-			for (MultipartFile multipartFile : multipartFiles) {
-				System.out.println("파일 이름들: " + multipartFile.getOriginalFilename());
-				
-		        if (multipartFile.isEmpty()) {
-		        	// 파일 추가가 없을 땐 밑 로직 생략 
-		        	System.out.println("추가되된 파일이 없음 \t");
-		            continue;
-		        }
-		        
-		        // 파일 정보 설정
-		        String originName = multipartFile.getOriginalFilename();
-		        String extensionName = FilenameUtils.getExtension(originName);
-		        UUID uuid = UUID.randomUUID();
-		        String extendedName = uuid + "." + extensionName;
-		        Long fileSize = multipartFile.getSize();
-		        
-		        // 파일 저장 경로
-		        String filePath = "D:\\upload\\" + extendedName;
+	        model.addAttribute("errorMsg", "비밀번호가 틀렸습니다.");
+	        
+	        return "answerUpdate";  // 비밀번호가 틀렸을 때 머무를 페이지
+	    }
 
-		        // FileVO 인스턴스 생성
-		        FileVO fileVO = new FileVO();
-		        fileVO.setFileName(originName);
-		        fileVO.setExtendedName(extendedName);
-		        fileVO.setFileSize(fileSize);
-		        fileVO.setNo(vo.getNo());
-		        
-		        // DB에 파일 정보 저장      
-		        boardService.insertFiles(fileVO);
-		        
-		        // 파일 저장
-		        try {
-		            multipartFile.transferTo(new File(filePath));
-		        } catch (IOException e) {
-		            // 예외 처리 (예: 로그 기록, 사용자에게 오류 메시지 표시 등)
-		            e.printStackTrace();
-		            // 필요시 특정 페이지로 리다이렉트할 수 있음
-		        }
-			
-			}
-			return "redirect:boardList.do";
-		} else {
-			return "redirect:boardList.do";
-		}
-	}
-
-	
-	// 글 삭제 기능
-	@RequestMapping(value = "/boardDelete.do")
-	public String deleteBoard(@RequestParam("no") int no,
-							  @RequestParam("originPw") String pw) throws Exception {
-		
-		BoardVO boardVO = new BoardVO();
-		boardVO = boardService.selectBoardInfo(no);
-		Boolean isPwCorrect = passwordEncoder.matches(pw, boardVO.getPassword());
-		
-		if (isPwCorrect) {
-			boardService.deletePost(no);
-			return "redirect:boardList.do";
-		} else {
-			return "redirect:boardList.do";
-		}
-	}
+	    return "redirect:boardList.do";
+	}	
 	
 	// 답변글 삭제 기능
 	@RequestMapping(value = "/answerDelete.do")
 	public String deleteAnswer(@RequestParam("no") int answerNo,
-							   @RequestParam("originPw") String pw) throws Exception {
+							   @RequestParam("originPw") String pw,
+							   Model model
+							   ) throws Exception {
 		
-		AnswerVO answerVO = new AnswerVO();
-		answerVO = boardService.selectAnswerInfo(answerNo);
+		AnswerVO answerVO = boardService.selectAnswerInfo(answerNo);
+		List<FileVO> fileVO = boardService.selectAnswerFilesInfo(answerNo);
 		Boolean isPwCorrect = passwordEncoder.matches(pw, answerVO.getPassword());
 		
 		if (isPwCorrect) {
 			boardService.deleteAnswer(answerNo);
+			
 			return "redirect:boardList.do";
 		} else {
-			return "redirect:boardList.do";
+			model.addAttribute("answerInfo", answerVO);
+			model.addAttribute("fileInfo", fileVO);
+	        model.addAttribute("errorMsg", "비밀번호를 확인하세요.");
+	        
+	        return "answerInfo";
 		}
 	}
 	
@@ -460,54 +306,7 @@ public class BoardController {
 	    
 	    // boardInfo.jsp에서 데이터 이름 가져오기
 	    String extendedName = req.getParameter("extendedName"); // upload할 때 변경된 파일 이름
-	    // String realName = req.getParameter("fileName"); // 원래 파일명(ex: apple.jpg)
 	    
-	    // 파일의 원래 이름을 가져오기 위해 service 호출
-	    FileVO fileVO = boardService.selectOriginalName(extendedName);
-	    String realName = fileVO.getFileName();
-	    System.out.println("파일이름: " + realName);
-	    
-	    // 다운로드할 파일의 경로 설정
-	    String downPathFrom = "D:\\upload\\" + extendedName;
-	    
-	    // 파일 객체 생성
-	    File file = new File(downPathFrom);
-	    
-	    // 파일이 존재하지 않을 경우 처리
-	    if (!file.exists()) {
-	        return; // 파일이 없으면 아무 것도 하지 않고 종료
-	    }
-	    
-	    // 여기서부터 주석 필요
-	    // 파일을 읽기 위한 FileInputStream 생성
-	    FileInputStream fileInputStream = new FileInputStream(downPathFrom);
-
-	    // 파일 이름 인코딩 처리 (한글 파일명 지원)
-	    extendedName = new String(extendedName.getBytes("UTF-8"), "8859_1");
-	    realName = URLEncoder.encode(realName, "UTF-8"); // 한글 이름 파일 다운 가능하게 인코딩
-	    
-	    // 응답의 콘텐츠 유형을 설정
-	    res.setContentType("application/octet-stream");
-	    // 다운로드할 파일 이름을 설정
-	    res.setHeader("Content-Disposition", "attachment; filename=" + realName); // 다운로드하는 파일 이름을 원래 이름으로 설정
-	    
-	    // 응답의 OutputStream을 가져옴
-	    OutputStream outputStream = res.getOutputStream();
-	    
-	    int length;
-	    // 파일의 크기에 맞춰 바이트 배열 생성
-	    byte[] b = new byte[(int) file.length()];
-	    
-	    // 파일을 읽어서 클라이언트로 전송
-	    while ((length = fileInputStream.read(b)) > 0) {
-	        outputStream.write(b, 0, length); // 읽은 데이터만큼 OutputStream에 쓰기
-	    }
-
-	    // OutputStream을 비움
-	    outputStream.flush();
-
-	    // 스트림 닫기
-	    outputStream.close(); // OutputStream 닫기
-	    fileInputStream.close(); // FileInputStream 닫기
+	    boardService.downloadFiles(extendedName, res);
 	}
 }
