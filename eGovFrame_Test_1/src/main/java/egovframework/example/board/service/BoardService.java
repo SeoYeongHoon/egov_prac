@@ -2,6 +2,10 @@ package egovframework.example.board.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.multipart.MultipartFile;
+
 public interface BoardService {
 
 	// 글 목록 
@@ -16,6 +20,9 @@ public interface BoardService {
 	
 	// 글 파일들 조회
 	List<FileVO> selectFilesInfo(int no) throws Exception;
+	
+	// 파일 단건 조회
+	FileVO getFileInfo(int fileNo) throws Exception;
 	
 	// 답변글 파일들 조회
 	List<FileVO> selectAnswerFilesInfo(int answerNo) throws Exception;
@@ -69,5 +76,21 @@ public interface BoardService {
 	List<AnswerVO> selectAnswer() throws Exception;
 	
 	// 답변글 개수
-	int selectAnswerCount(BoardSearchVO boardSearchVO) throws Exception;
+	int selectAnswerCount() throws Exception;
+	
+	
+//	기능들을 Controller로부터 ServiceImpl 단으로 빼는 작업중
+	void insertBoardWithFiles(BoardVO vo, List<MultipartFile> multipartFiles) throws Exception;
+
+	void insertAnswerWithFiles(AnswerVO answerVO, int no, List<MultipartFile> multipartFiles) throws Exception;
+
+	boolean updatePostWithFiles(BoardVO vo, int no, String pw, List<MultipartFile> multipartFiles, List<Integer> deleteNo) throws Exception;
+
+	boolean updateAnswerWithFiles(AnswerVO vo, int answerNo, String pw, List<MultipartFile> multipartFiles, List<Integer> deleteNo) throws Exception;
+
+	void downloadFiles(String extendedName, HttpServletResponse res) throws Exception;
+
+	List<BoardsVO> selectBoardListWithAnswers(BoardSearchVO searchVO) throws Exception;
+
+	
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import egovframework.example.board.service.AnswerVO;
 import egovframework.example.board.service.BoardSearchVO;
 import egovframework.example.board.service.BoardVO;
+import egovframework.example.board.service.BoardsVO;
 import egovframework.example.board.service.FileVO;
 import egovframework.rte.psl.dataaccess.mapper.Mapper;
 
@@ -14,6 +15,8 @@ public interface BoardMapper {
 	// 글 목록
 //	List<?> selectBoardList(BoardSearchVO searchVO) throws Exception;
 	List<BoardVO> selectBoardList(BoardSearchVO searchVO) throws Exception;
+	
+	List<BoardsVO> selectBoardLists(BoardSearchVO searchVO) throws Exception;
 	
 	// 글 개수
 	int selectBoardCount(BoardSearchVO boardSearchVO) throws Exception;
@@ -26,6 +29,9 @@ public interface BoardMapper {
 	
 	// 답변글 파일들 조회
 	List<FileVO> selectAnswerFilesInfo(int answerNo) throws Exception;
+	
+	// 파일 단건 조회
+	FileVO getFileInfo(int fileNo) throws Exception;
 	
 	// 글 작성
 	void insertBoard(BoardVO vo) throws Exception;
@@ -76,5 +82,5 @@ public interface BoardMapper {
 	List<AnswerVO> selectAnswer() throws Exception;
 	
 	// 답변글 개수
-	int selectAnswerCount(BoardSearchVO boardSearchVO) throws Exception;
+	int selectAnswerCount() throws Exception;
 }

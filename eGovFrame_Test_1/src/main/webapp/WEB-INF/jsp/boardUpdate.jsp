@@ -8,26 +8,6 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
 <title>게시글 수정</title>
 </head>
-<script>
-	function updateBoard(pw) {
-		let filesName = document.querySelector('#file');
-		console.log("첨부파일의 파일들: ", filesName);
-		
-		document.boardUpdateForm.action = "<c:url value='boardUpdate.do' />";
-		document.boardUpdateForm.submit();
-		
-		/* let pwCheck = document.querySelector('#passwordCheck');
-		
-		if (pwCheck.value === pw) {
-			document.boardUpdateForm.action = "<c:url value='boardUpdate.do' />";
-			document.boardUpdateForm.submit();
-		} else {
-			alert("비밀번호 확인");
-			pwCheck.value = '';
-			pwCheck.focus();
-		} */
-	}
-</script>
 <style>
 	.delete {
 		cursor: pointer;
@@ -92,11 +72,17 @@
 			</div>
 			
 			<div class="save-btn-area">		
-				<button class="post-save-btn" type="button" onClick="updateBoard('<c:out value="${boardInfo.password }" />')">저장</button>
+				<button class="post-save-btn" type="button" onClick="updateBoard()">저장</button>
 				<button class="post-cancel-btn" type="button" onClick="javascript:history.back()">취소</button>
 			</div>
 		</form>
 	</div>
+	<!-- 비밀번호 틀렸을 경우 alert창 띄우기 -->
+	<c:if test="${not empty errorMsg}">
+	    <script>
+	        alert("${errorMsg}");
+	    </script>
+	</c:if>
 </body>
 <script>
 	let orgFiles = document.querySelectorAll('.filebox');
@@ -162,6 +148,18 @@
 		} else {
 			return;	
 		}
+	}
+	
+	function updateBoard() {
+	    var password = document.getElementById('passwordCheck').value;
+	    if (password === '') {
+	        alert('비밀번호를 입력하세요.');
+	        return;
+	    }
+	    // 비밀번호를 POST 방식으로 전송하여 수정 페이지로 이동
+	    var form = document.getElementById('boardUpdateForm');
+	    form.action = 'boardUpdate.do';  // 수정 페이지로 POST 요청
+	    form.submit();
 	}
 </script>
 </html>

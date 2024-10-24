@@ -16,28 +16,16 @@
 	}
 
 	// 수정 기능
-	function updateFormBtn() {
-		/* let pwCheck = document.querySelector('#passwordCheck');
-		
-		if (pwCheck.value === pw) {
-			document.boardInfoForm.action = "<c:url value='boardUpdatePage.do' />";
-			document.boardInfoForm.submit();
-		} else {
-			alert("잘못된 비밀번호");
-			pwCheck.value = '';
-			pwCheck.focus();
-		} */
-		
-		
+	/* function updateFormBtn() {
 		document.boardInfoForm.action = "<c:url value='boardUpdatePage.do' />";
 		document.boardInfoForm.submit();
-	}
+	} */
 	
 	// 삭제 기능
-	function deleteFormBtn(pw) {
+	/* function deleteFormBtn(pw) {
 		document.boardInfoForm.action = "<c:url value='boardDelete.do' />";
 		document.boardInfoForm.submit();
-	}
+	} */
 	
 	// 답변 이동
 	function answerFormBtn(no) {
@@ -84,7 +72,6 @@
 						<c:set var="isFileExist" value="${files.fileSize }" />
 						<c:if test="${isFileExist ne 0 }">
 							<input type="hidden" name="fileName" value="${files.fileName }" />
-
 							<a style="display: block;" class="post-file" href="#" onClick="downloadFile('<c:out value="${files.extendedName }" />')">
 								<span>${files.fileName }</span>
 								<span class="postFileSize" style="color: darkgray;">[${files.fileSize } byte]</span>	
@@ -93,6 +80,7 @@
 					</c:forEach>
 				</div>
 			</div>
+
 		
 			<!-- 하단 버튼들(목록, 비밀번호 입력란, 수정, 삭제, 답변등록) -->
 			<div style="display: flex; position: relative;">
@@ -100,11 +88,43 @@
 				<div class="option-btns">
 					<input style="width: 250px; height: 35px; padding-left: 10px; border: 1px solid rgb(0, 0, 0, 0.1);" name="originPw" type="password" id="passwordCheck" placeholder="비밀번호" />
 					<button class="to-update-btn" type="button" onClick="updateFormBtn()">수정</button>
-					<button class="to-delete-btn" type="button" onClick="deleteFormBtn('<c:out value="${boardInfo.password }" />')">삭제</button>
+					<button class="to-delete-btn" type="button" onClick="deleteFormBtn()">삭제</button>
 					<button class="to-answer-btn" type="button" onClick="answerFormBtn('<c:out value="${boardInfo.no }" />')">답변등록</button>
 				</div>
 			</div>
 		</form>
 	</div>
+	
+	<!-- 비밀번호 틀렸을 경우 alert창 띄우기 -->
+	<c:if test="${not empty errorMsg}">
+	    <script>
+	        alert("${errorMsg}");
+	    </script>
+	</c:if>
 </body>
+<script>
+	function updateFormBtn() {
+	    var password = document.getElementById('passwordCheck').value;
+	    if (password === '') {
+	        alert('비밀번호를 입력하세요.');
+	        return;
+	    }
+	    // 비밀번호를 POST 방식으로 전송하여 수정 페이지로 이동
+	    var form = document.getElementById('boardInfoForm');
+	    form.action = 'boardUpdatePage.do';  // 수정 페이지로 POST 요청
+	    form.submit();
+	}
+	
+	function deleteFormBtn() {
+        var password = document.getElementById('passwordCheck').value;
+        if (password === '') {
+            alert('비밀번호를 입력하세요.');
+            return;
+        }
+        // 비밀번호를 POST 방식으로 전송하여 삭제 처리
+        var form = document.getElementById('boardInfoForm');
+        form.action = 'boardDelete.do';  // 삭제 요청
+        form.submit();
+    }
+</script>
 </html>

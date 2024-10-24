@@ -9,10 +9,10 @@
 <link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/board.css'/>"/>
 </head>
 <script>
-function updateBoard() {
+/* function updateBoard(originPw) {
 	document.answerPostForm.action = "<c:url value='answerUpdate.do' />";
 	document.answerPostForm.submit();
-}
+} */
 </script>
 <style>
 	.delete {
@@ -29,12 +29,9 @@ function updateBoard() {
 </style>
 <body>
 	<div id="boardAdd">
-		<div style="text-align: center; margin-bottom: 40px;">
-			<h3>[ ${boardInfo.title } ] 글에 대한 답변글</h3>
-		</div>
-		<form action="answerPost.do" id="answerPostForm" name="answerPostForm" method="POST" encType="multipart/form-data">
+		<form id="answerPostForm" name="answerPostForm" method="POST" encType="multipart/form-data">
 			
-			<input type="hidden" name="answerNo" value="${answerInfo.no }" />
+			<input type="hidden" name="answerNo" value="${answerInfo.answerNo }" />
 			<div class="writer-area">
 				<div class="writer-content">				
 					<label style="width: 165.4px;" for="writer">작성자 <span style="color: red;">&#10004;</span></label>
@@ -42,7 +39,7 @@ function updateBoard() {
 				</div>
 				<div class="password-content">
 					<label class="post-area-label" for="password">비밀번호 <span style="color: red;">&#10004;</span></label>
-					<input class="info-input" type="password" name="password" required />
+					<input class="info-input" type="password" name="originPw" id="passwordCheck" required />
 				</div>
 			</div>
 			<div class="title-area">
@@ -68,7 +65,7 @@ function updateBoard() {
 							</c:when>
 							<c:otherwise>
 								<div id="file${status.index }" class="filebox"  style="height:35px; display: flex; align-items: center;">
-									<input type="hidden" name="fileNum" value="${files.fileNo }" />
+									<input type="hidden" class="fileNum" name="fileId" value="${files.fileNo }" />
 									<a style="display: flex; align-items: center; cursor: pointer;" class="delete" onClick="deleteFile('<c:out value="${status.index }" />')">
 										<img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png' />" />
 										<span style="margin-left: 10px;" class="name">${files.fileName }</span>
@@ -85,6 +82,12 @@ function updateBoard() {
 			</div>
 		</form>
 	</div>
+	<!-- 비밀번호 틀렸을 경우 alert창 띄우기 -->
+	<c:if test="${not empty errorMsg}">
+	    <script>
+	        alert("${errorMsg}");
+	    </script>
+	</c:if>
 </body>
 <script>
 	let orgFiles = document.querySelectorAll('.filebox');
@@ -149,6 +152,18 @@ function updateBoard() {
 		} else {
 			return;	
 		}
+	}
+	
+	function updateBoard() {
+	    var password = document.getElementById('passwordCheck').value;
+	    if (password === '') {
+	        alert('비밀번호를 입력하세요.');
+	        return;
+	    }
+	    // 비밀번호를 POST 방식으로 전송하여 수정 페이지로 이동
+	    var form = document.getElementById('answerPostForm');
+	    form.action = 'answerUpdate.do';  // 수정 페이지로 POST 요청
+	    form.submit();
 	}
 </script>
 </html>

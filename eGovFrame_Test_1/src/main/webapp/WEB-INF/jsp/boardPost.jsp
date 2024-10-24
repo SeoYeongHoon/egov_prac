@@ -59,21 +59,17 @@
 	</div>
 </body>
 <script>
-	const myFile = document.querySelector("#file");
-	const fileNameList = document.querySelector("#file-add-list");
-	
 	var fileNo = 0;
-	var filesArr = new Array();
+	var filesArr = []; // 배열 선언
 	
 	function addFile(obj) {
-	    var curFileCnt = obj.files.length;  // 현재 선택된 첨부파일 개수
+	    var curFileCnt = obj.files.length; 
 	    
 	    for (var i = 0; i < curFileCnt; i++) {
-	
 	        const file = obj.files[i];
-	        filesArr.push(file);
+	        filesArr.push(file); // 파일 배열에 추가
 	
-	        // 목록 추가
+	        // 파일 목록 추가
 	        let htmlData = '';
 	        htmlData += '<div id="file' + fileNo + '" class="filebox" style="height:35px;">';
 	        htmlData += '<a class="delete" onclick="deleteFile(' + fileNo + ');"><img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png'/>"</a>';
@@ -81,28 +77,39 @@
 	        htmlData += '</div>';
 	        
 	        $('.file-add-list').append(htmlData);
-	        fileNo++;
+	        fileNo++; // 파일 번호 증가
 	    }
 	}
 	
 	function deleteFile(num) {
-		document.querySelector("#file" + num).remove(); // div 삭제
 		
-		const dataTransfer = new DataTransfer();
+		if (confirm("삭제 하시겠습니까?")) {
+			
+		    // filesArr에서 해당 파일 삭제
+		    filesArr.splice(num, 1); // 배열에서 파일 삭제
 		
-		let files = $('#file')[0].files; // 입력한 파일 변수에 할당
+		    const dataTransfer = new DataTransfer();
 		
-		let dataArray = Array.from(files); // 변수에 할당된 파일을 배열로 변환
+		    // 남은 파일들로 새로운 파일 리스트 생성
+		    filesArr.forEach(function(file) {
+		        dataTransfer.items.add(file);
+		    });
 		
-		dataArray.splice(num, 1); // 해당하는 index의 파일을 배열에서 제거
+		    // input의 파일 리스트 갱신
+		    $('#file')[0].files = dataTransfer.files;
 		
-		dataArray.forEach(function(file) {
-			dataTransfer.items.add(file);
-			// 남은 배열을 dataTransfer로 처리(Array -> FileList)
-		});
-		
-		$('#file')[0].files = dataTransfer.files; // 제거 처리된 FileList를 돌려줌
-		
+		    // 화면에서 파일 리스트 업데이트
+		    $('.file-add-list').empty(); // 기존 리스트 초기화
+		    fileNo = 0; // 번호 초기화
+		    filesArr.forEach(function(file) {
+		        let htmlData = '<div id="file' + fileNo + '" class="filebox" style="height:35px;">';
+		        htmlData += '<a class="delete" onclick="deleteFile(' + fileNo + ');"><img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png'/>"</a>';
+		        htmlData += '<p style="margin-left: 10px;" class="name">' + file.name + '</p>';
+		        htmlData += '</div>';
+		        $('.file-add-list').append(htmlData);
+		        fileNo++;
+		    });
+		}
 	}
 </script>
 </html>
