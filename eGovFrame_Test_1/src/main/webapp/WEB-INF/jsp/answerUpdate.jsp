@@ -4,29 +4,15 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/board.css'/>" />
+<title>게시글 답변</title>
 <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
-<title>게시글 수정</title>
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/board.css'/>"/>
 </head>
 <script>
-	function updateBoard(pw) {
-		let filesName = document.querySelector('#file');
-		console.log("첨부파일의 파일들: ", filesName);
-		
-		document.boardUpdateForm.action = "<c:url value='boardUpdate.do' />";
-		document.boardUpdateForm.submit();
-		
-		/* let pwCheck = document.querySelector('#passwordCheck');
-		
-		if (pwCheck.value === pw) {
-			document.boardUpdateForm.action = "<c:url value='boardUpdate.do' />";
-			document.boardUpdateForm.submit();
-		} else {
-			alert("비밀번호 확인");
-			pwCheck.value = '';
-			pwCheck.focus();
-		} */
-	}
+function updateBoard() {
+	document.answerPostForm.action = "<c:url value='answerUpdate.do' />";
+	document.answerPostForm.submit();
+}
 </script>
 <style>
 	.delete {
@@ -42,36 +28,39 @@
 	}
 </style>
 <body>
-	<div id="boardUpdate">
-		<form id="boardUpdateForm" name="boardUpdateForm" method="POST" encType="multipart/form-data">
+	<div id="boardAdd">
+		<div style="text-align: center; margin-bottom: 40px;">
+			<h3>[ ${boardInfo.title } ] 글에 대한 답변글</h3>
+		</div>
+		<form action="answerPost.do" id="answerPostForm" name="answerPostForm" method="POST" encType="multipart/form-data">
+			
+			<input type="hidden" name="answerNo" value="${answerInfo.no }" />
 			<div class="writer-area">
-				<input type="hidden" name="no" value="${boardInfo.no }" />
 				<div class="writer-content">				
-					<label style="width: 165.4px;">작성자 <span style="color: red;">&#10004;</span></label>
-					<input class="info-input" type="text" name="writer" value="${boardInfo.writer }" required/>
+					<label style="width: 165.4px;" for="writer">작성자 <span style="color: red;">&#10004;</span></label>
+					<input class="info-input" type="text" name="writer" value="${answerInfo.writer }" required />
 				</div>
 				<div class="password-content">
-					<label class="post-area-label">비밀번호 <span style="color: red;">&#10004;</span></label>
-					<input class="info-input" type="password" name="originPw" id="passwordCheck" required />
+					<label class="post-area-label" for="password">비밀번호 <span style="color: red;">&#10004;</span></label>
+					<input class="info-input" type="password" name="password" required />
 				</div>
 			</div>
 			<div class="title-area">
-				<label class="post-area-label">제목 <span style="color: red;">&#10004;</span></label>
-				<input class="title-input" type="text" name="title" value="${boardInfo.title }" required />		
+				<label class="post-area-label" for="title">제목 <span style="color: red;">&#10004;</span></label>
+				<input class="title-input" type="text" name="title" value="${answerInfo.title }" required />		
 			</div>
 			<div class="content-area">
-				<label class="post-area-label">내용</label>
-				<textarea class="content-input" name="content">${boardInfo.content }</textarea>
+				<label class="post-area-label" for="content">내용</label>
+				<textarea class="content-input" name="content">${answerInfo.content }</textarea>
 			</div>
 			<div>
 				<div class="file-area">
-					<label style="width: 165.4px;" class="post-area-label">첨부파일</label>
+					<label style="width: 165.4px;" class="post-area-label" for="uploadFile">첨부파일</label>
 					<input class="upload-name" readonly />
 					<label class="upload-btn" for="file">파일선택</label>
 					<input type="file" onchange="addFile(this);" id="file" name="multiFile" multiple />
 				</div>
 				<div class="file-update-list" style="margin-left: 165.4px;">
-					<!-- <input type="hidden" name="deletedFileNo" class="deletedFiles" /> -->
 					<c:forEach var="files" items="${fileInfo }" varStatus="status">
 						<c:set var="isFileExist" value="${files.fileName }" />
 						<c:choose>
@@ -79,7 +68,7 @@
 							</c:when>
 							<c:otherwise>
 								<div id="file${status.index }" class="filebox"  style="height:35px; display: flex; align-items: center;">
-									<input type="hidden" class="fileNum" name="fileId" value="${files.fileNo }" />
+									<input type="hidden" name="fileNum" value="${files.fileNo }" />
 									<a style="display: flex; align-items: center; cursor: pointer;" class="delete" onClick="deleteFile('<c:out value="${status.index }" />')">
 										<img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png' />" />
 										<span style="margin-left: 10px;" class="name">${files.fileName }</span>
@@ -90,10 +79,9 @@
 					</c:forEach>
 				</div>
 			</div>
-			
-			<div class="save-btn-area">		
-				<button class="post-save-btn" type="button" onClick="updateBoard('<c:out value="${boardInfo.password }" />')">저장</button>
-				<button class="post-cancel-btn" type="button" onClick="javascript:history.back()">취소</button>
+			<div class="save-btn-area">
+				<button class="post-save-btn" type="button" onClick="updateBoard()">저장</button>
+				<button class="post-cancel-btn" type="button" onClick="location.href='boardList.do'">취소</button>
 			</div>
 		</form>
 	</div>
@@ -101,7 +89,7 @@
 <script>
 	let orgFiles = document.querySelectorAll('.filebox');
 	
-	var fileNo = orgFiles.length;
+	var fileNo = 0;
 	var filesArr = new Array();
 	
 	for (var i = 0; i < orgFiles.length; i++) {
@@ -110,7 +98,7 @@
 	}
 	
 	function addFile(obj) {
-	    let curFileCnt = obj.files.length;  // 현재 선택된 첨부파일 개수
+	    var curFileCnt = obj.files.length;  // 현재 선택된 첨부파일 개수
 	    
 	    for (var i = 0; i < curFileCnt; i++) {
 	
@@ -119,9 +107,9 @@
 	
 	        // 목록 추가
 	        let htmlData = '';
-	        htmlData += '<div id="file' + fileNo + '" class="filebox" style="height:35px; display: flex; align-items: center;">';
+	        htmlData += '<div id="file' + fileNo + '" class="filebox" style="height:35px;">';
 	        htmlData += '<input type="hidden" class="fileNum" name="fileId" value="${files.fileNo }" />';
-	        htmlData += '<a class="delete" onclick="deleteFile(' + fileNo + ');"><img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png'/>"</a>';
+	        htmlData += '<a style="display: flex; align-items: center;" class="delete" onclick="deleteFile(' + fileNo + ');"><img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png'/>"</a>';
 	        htmlData += '<p style="margin-left: 10px;" class="name">' + file.name + '</p>';
 	        htmlData += '</div>';
 	        
@@ -131,7 +119,6 @@
 	}
 	
 	function deleteFile(num) {
-		
 		if (confirm("삭제 하시겠습니까?")) {
 			let fileIdVal = document.querySelector("#file" + num).children.fileId.value;
 			console.log(fileIdVal);

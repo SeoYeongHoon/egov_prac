@@ -133,10 +133,10 @@ crossorigin="anonymous">
 		            </thead>
 		            <tbody id="listBodyArea">
 		                <c:forEach var="list" items="${boardList}" varStatus="status">
-	                    	<input type="hidden" value="${list.isAnswered }" />
+	                    	<input type="hidden" value="${list.isAnswer }" />
 		                    <tr>
 		                        <td style="text-align: center;">
-		                            <c:out value="${paginationInfo.totalRecordCount+1 - ((searchVO.pageIndex-1) * searchVO.pageSize + status.index)}"/>
+		                            <c:out value="${paginationInfo.totalRecordCount+1 - ((searchVO.pageIndex-1) * searchVO.pageSize + status.count)}"/>
 		                        </td>
 		                        <td class="info-select" onClick="selectBoardInfo('<c:out value="${list.no }" />')">
 		                            <c:out value="${list.title }"/>
@@ -146,9 +146,9 @@ crossorigin="anonymous">
 		                        <td style="text-align: center;"><c:out value="${list.view }"/></td>
 		                    </tr>
 		                    
-		                    <c:set var="isAnswered" value="${list.isAnswered }" />
+		                    <c:set var="isAnswer" value="${list.isAnswer }" />
 		                    <c:forEach var="answer" items="${answerList }" varStatus="status">
-		                    	<c:if test="${isAnswered eq 1 and list.no eq answer.no}">
+		                    	<c:if test="${isAnswer eq 1 and list.no eq answer.no}">
 		                            <tr style="background-color: aliceblue;">
 		                                <td style="text-align: center">[답변]</td>
 		                                <td class="info-select" onClick="selectAnswerInfo('<c:out value="${answer.answerNo }" />')">
@@ -174,18 +174,18 @@ crossorigin="anonymous">
 		        	<a class="paging-move-btn" href="javascript:goToPage(${paginationInfo.currentPageNo - 1})">&lt;</a>
 				</c:when>
 				<c:otherwise>
-					<a style="width: 40px; margin: 5px;"></a>
-					<a style="width: 40px; margin: 5px;"></a>
+					<a class="paging-move-btn" href="#">&laquo;</a>
+		        	<a class="paging-move-btn" href="#">&lt;</a>
 				</c:otherwise>
 			</c:choose>
 		    
-		    <c:forEach var="i" begin="${paginationInfo.firstPageNoOnPageList}" end="${paginationInfo.lastPageNoOnPageList}">
+		    <c:forEach var="num" begin="${paginationInfo.firstPageNoOnPageList}" end="${paginationInfo.lastPageNoOnPageList}">
 		        <c:choose>
-		            <c:when test="${i == paginationInfo.currentPageNo}">
-		                <span class="paging-number-on">${i}</span>
+		            <c:when test="${num == paginationInfo.currentPageNo}">
+		                <span class="paging-number-on">${num}</span>
 		            </c:when>
 		            <c:otherwise>
-		                <a class="paging-number-off" href="javascript:goToPage(${i})">${i}</a>
+		                <a class="paging-number-off" href="javascript:goToPage(${num})">${num}</a>
 		            </c:otherwise>
 		        </c:choose>
 		    </c:forEach>
@@ -196,8 +196,8 @@ crossorigin="anonymous">
 		        	<a class="paging-move-btn" href="javascript:goToPage(${paginationInfo.totalPageCount})">&raquo;</a>
 		    	</c:when>
 		    	<c:otherwise>
-		    		<a style="width: 40px; margin: 5px;"></a>
-					<a style="width: 40px; margin: 5px;"></a>
+		    		<a class="paging-move-btn" href="#">&gt;</a>
+		        	<a class="paging-move-btn" href="#">&raquo;</a>
 		    	</c:otherwise>
 		    </c:choose>
 		</div>

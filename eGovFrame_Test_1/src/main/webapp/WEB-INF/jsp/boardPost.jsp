@@ -91,7 +91,6 @@
 		const dataTransfer = new DataTransfer();
 		
 		let files = $('#file')[0].files; // 입력한 파일 변수에 할당
-		console.log("첨부한 파일들: ", files);
 		
 		let dataArray = Array.from(files); // 변수에 할당된 파일을 배열로 변환
 		
