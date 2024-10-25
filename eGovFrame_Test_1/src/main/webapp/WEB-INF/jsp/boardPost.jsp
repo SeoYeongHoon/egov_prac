@@ -59,11 +59,11 @@
 	</div>
 </body>
 <script>
-	var fileNo = 0;
-	var filesArr = []; // 배열 선언
+	var fileNo = 0; // 파일이 있는 태그마다 id 값을 주기 위해 선언
+	var filesArr = []; // 파일들을 담을 배열 선언
 	
 	function addFile(obj) {
-	    var curFileCnt = obj.files.length; 
+	    var curFileCnt = obj.files.length; // 현재 파일들의 크기 담기 
 	    
 	    for (var i = 0; i < curFileCnt; i++) {
 	        const file = obj.files[i];
@@ -82,30 +82,39 @@
 	}
 	
 	function deleteFile(num) {
-		
+		// 1. 삭제할 파일을 filesArr에서 제거(인덱스만)
+		// 2. dataTransfer로 접근해서 실제 FileList에 있는 file 요소 제거.
+		// 3. 이 후 FileList에 제거한 파일 요소를 넣음.
+		// 4. 파일 목록 리스트 초기화, 파일번호 초기화
+		// 5. 목록 재생성
 		if (confirm("삭제 하시겠습니까?")) {
 			
 		    // filesArr에서 해당 파일 삭제
-		    filesArr.splice(num, 1); // 배열에서 파일 삭제
+		    filesArr.splice(num, 1);
 		
+		    // input type="file"의 선택된 파일들의 목록에 접근 가능하기 위해 DataTransfer 객체 선언
 		    const dataTransfer = new DataTransfer();
 		
-		    // 남은 파일들로 새로운 파일 리스트 생성
+		    // 선택된 파일들을 dataTransfer로 처리(Array -> FileList)
 		    filesArr.forEach(function(file) {
 		        dataTransfer.items.add(file);
 		    });
 		
-		    // input의 파일 리스트 갱신
+		    // input의 FileList에 dataTransfer의 파일들을 넣음
 		    $('#file')[0].files = dataTransfer.files;
 		
 		    // 화면에서 파일 리스트 업데이트
 		    $('.file-add-list').empty(); // 기존 리스트 초기화
 		    fileNo = 0; // 번호 초기화
+		    
+		    // 초기화 된 후 목록 생성
 		    filesArr.forEach(function(file) {
-		        let htmlData = '<div id="file' + fileNo + '" class="filebox" style="height:35px;">';
+		    	let htmlData = '';
+		        htmlData += '<div id="file' + fileNo + '" class="filebox" style="height:35px;">';
 		        htmlData += '<a class="delete" onclick="deleteFile(' + fileNo + ');"><img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png'/>"</a>';
 		        htmlData += '<p style="margin-left: 10px;" class="name">' + file.name + '</p>';
 		        htmlData += '</div>';
+		        
 		        $('.file-add-list').append(htmlData);
 		        fileNo++;
 		    });

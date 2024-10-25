@@ -15,6 +15,8 @@
 			<tx:method name="*" rollback-for="Exception"/>
 		</tx:attributes>
 	</tx:advice>
+	
+	<tx:annotation-driven transaction-manager="txManager" />
 
 	<aop:config>
 		<aop:pointcut id="requiredTx" expression="execution(* egovframework.example.sample..impl.*Impl.*(..))"/>

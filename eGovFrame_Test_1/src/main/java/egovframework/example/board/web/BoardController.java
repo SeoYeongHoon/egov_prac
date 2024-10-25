@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import egovframework.example.board.service.AnswerVO;
 import egovframework.example.board.service.BoardSearchVO;
 import egovframework.example.board.service.BoardService;
-import egovframework.example.board.service.BoardVO;
 import egovframework.example.board.service.BoardsVO;
 import egovframework.example.board.service.FileVO;
 import egovframework.rte.fdl.property.EgovPropertyService;
@@ -44,8 +42,8 @@ public class BoardController {
 	                        @ModelAttribute("searchVO") BoardSearchVO searchVO,
 	                        @RequestParam(value = "pageNo", defaultValue = "1") String pageNo,
 	                        @RequestParam(required = false, defaultValue = "1") String searchCondition,
-	                        @RequestParam(required = false) String searchKeyword,
-	                        @RequestParam(required = false) String isAnswered
+	                        @RequestParam(required = false) String searchKeyword
+	                        // @RequestParam(required = false) String isAnswered
 	                        ) throws Exception {
 	    // 페이지 번호와 검색 조건 설정
 	    int pageIndex = Integer.parseInt(pageNo);
@@ -69,7 +67,7 @@ public class BoardController {
 	    searchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
 
 	    // 게시글 목록 조회 (답변 포함)
-	    List<BoardsVO> boardList = boardService.selectBoardListWithAnswers(searchVO);
+	    List<BoardsVO> boardList = boardService.selectBoardLists(searchVO);
 
 	    // 전체 게시글 수 조회
 	    int totalCnt = boardService.selectBoardCount(searchVO);
@@ -95,10 +93,11 @@ public class BoardController {
 	
 	// 글 쓰기 기능
 	@RequestMapping(value = "/boardPost.do", method = RequestMethod.POST)
-    public String addPost(@ModelAttribute("vo") BoardVO vo,
-                          @RequestParam("multiFile") List<MultipartFile> multipartFiles) throws Exception {
+    public String addPost(@ModelAttribute("vo") BoardsVO vo,
+                          @RequestParam("multiFile") List<MultipartFile> multipartFiles
+                          ) throws Exception {
 
-        boardService.insertBoardWithFiles(vo, multipartFiles);
+        boardService.insertBoard(vo, multipartFiles);
         
         return "redirect:boardList.do";
     }
@@ -107,10 +106,10 @@ public class BoardController {
 	@RequestMapping(value = "/boardInfo.do")
 	public String boardInfo(@RequestParam("selectedBoardId") int boardId, Model model) throws Exception {
 		boardService.updateView(boardId); // 조회수 증가
-		BoardVO boardVO = boardService.selectBoardInfo(boardId);
+		BoardsVO boardsVO = boardService.selectBoardInfo(boardId);
 		List<FileVO> fileVO = boardService.selectFilesInfo(boardId);
 		
-		model.addAttribute("boardInfo", boardVO);
+		model.addAttribute("boardInfo", boardsVO);
 		model.addAttribute("fileInfo", fileVO);
 		
 		return "boardInfo";
@@ -118,21 +117,21 @@ public class BoardController {
 	
 	// 글 수정 페이지이동
 	@RequestMapping(value = "/boardUpdatePage.do")
-	public String updatePostPage(@RequestParam("no") int no, 
+	public String updatePostPage(@RequestParam("id") int id, 
 								 @RequestParam("originPw") String pw,
 								 Model model) throws Exception {
 		
-		BoardVO boardVO = boardService.selectBoardInfo(no);
-		List<FileVO> fileVO = boardService.selectFilesInfo(no);
-		Boolean isPwCorrect = passwordEncoder.matches(pw, boardVO.getPassword());
+		BoardsVO boardsVO = boardService.selectBoardInfo(id);
+		List<FileVO> fileVO = boardService.selectFilesInfo(id);
+		Boolean isPwCorrect = passwordEncoder.matches(pw, boardsVO.getPassword());
 		
 		if (isPwCorrect) {
-			model.addAttribute("boardInfo", boardVO);
+			model.addAttribute("boardInfo", boardsVO);
 			model.addAttribute("fileInfo", fileVO);
 			
 			return "boardUpdate";
 		} else {
-			model.addAttribute("boardInfo", boardVO);
+			model.addAttribute("boardInfo", boardsVO);
 			model.addAttribute("fileInfo", fileVO);
 	        model.addAttribute("errorMsg", "비밀번호를 확인하세요.");
 	        
@@ -142,17 +141,16 @@ public class BoardController {
 	
 	// 글 수정 기능
 	@RequestMapping(value = "/boardUpdate.do", method = RequestMethod.POST)
-	public String updatePost(BoardVO vo,
-	                         @RequestParam("no") int no,
+	public String updatePost(BoardsVO vo,
+	                         @RequestParam("id") int id,
 	                         @RequestParam("originPw") String pw,
 	                         @RequestParam(value = "multiFile", required = false) List<MultipartFile> multipartFiles,
 	                         @RequestParam(value = "deletedFileNo", required = false) List<Integer> deleteNo,
 	                         Model model
 							 ) throws Exception {
 	    
-	    boolean isUpdated = boardService.updatePostWithFiles(vo, no, pw, multipartFiles, deleteNo);
-	    // BoardVO boardVO = boardService.selectBoardInfo(no);
-		List<FileVO> fileVO = boardService.selectFilesInfo(no);
+	    boolean isUpdated = boardService.updateBoard(vo, id, pw, multipartFiles, deleteNo);
+		List<FileVO> fileVO = boardService.selectFilesInfo(id);
 		
 	    // 수정이 성공했으면 목록으로 이동, 실패 시 원래 페이지로 리다이렉트
 	    if (!isUpdated) {
@@ -163,31 +161,7 @@ public class BoardController {
 	    }
 
 	    return "redirect:/boardList.do";
-	}
-
-	
-	// 글 삭제 기능
-	@RequestMapping(value = "/boardDelete.do")
-	public String deleteBoard(@RequestParam("no") int no,
-							  @RequestParam("originPw") String pw,
-							  Model model) throws Exception {
-		
-		BoardVO boardVO = boardService.selectBoardInfo(no);
-		List<FileVO> fileVO = boardService.selectFilesInfo(no);
-		Boolean isPwCorrect = passwordEncoder.matches(pw, boardVO.getPassword());
-		
-		if (isPwCorrect) {
-			boardService.deletePost(no);
-			
-			return "redirect:boardList.do";
-		} else {
-			model.addAttribute("boardInfo", boardVO);
-			model.addAttribute("fileInfo", fileVO);
-	        model.addAttribute("errorMsg", "비밀번호를 확인하세요.");
-	        
-	        return "boardInfo";
-		}
-	}
+	}	
 	
 	
 	/* 
@@ -197,109 +171,32 @@ public class BoardController {
 	 *  */ 
 	// 답변 글 작성 페이지 이동
 	@RequestMapping(value = "/boardAnswerPage.do")
-	public String answerPage(@RequestParam("no") int no, Model model) throws Exception {
-		BoardVO boardVO = new BoardVO();
-		boardVO = boardService.selectBoardInfo(no);
+	public String answerPage(@RequestParam("id") int id, Model model) throws Exception {
+		BoardsVO boardsVO = boardService.selectBoardInfo(id);
 		
-		model.addAttribute("boardInfo", boardVO);
+		model.addAttribute("boardInfo", boardsVO);
 		return "answerPost";
 	}
 	
 	// 답변 글 작성 기능
 	@RequestMapping(value = "/answerPost.do", method = RequestMethod.POST)
-	public String addAnswerPost(@ModelAttribute("answerVO") AnswerVO answerVO,
-	                            @RequestParam("no") int no,
+	public String addAnswerPost(BoardsVO boardsVO,
+	                            @RequestParam("parentId") int parentId, // parentId
 	                            @RequestParam("multiFile") List<MultipartFile> multipartFiles) throws Exception {
 
-	    boardService.insertAnswerWithFiles(answerVO, no, multipartFiles);
+	    boardService.insertAnswer(boardsVO, parentId, multipartFiles);
+	    
+	    System.out.println("부모 id: " + parentId);
 	    
 	    return "redirect:boardList.do";
 	}
 	
-	// 답변글 단건 조회
-	@RequestMapping(value = "/answerInfo.do")
-	public String answerInfo(@RequestParam("selectedAnswerNo") int answerNo, Model model) throws Exception {
-		boardService.updateAnswerView(answerNo); // 조회수 증가
-		AnswerVO answerVO = boardService.selectAnswerInfo(answerNo);
-		List<FileVO> fileVO = boardService.selectAnswerFilesInfo(answerNo);
-		
-		model.addAttribute("answerInfo", answerVO);
-		model.addAttribute("fileInfo", fileVO);
-		
-		return "answerInfo";
-	}
 	
-	// 답변글 수정 페이지이동
-	@RequestMapping(value = "/answerUpdatePage.do")
-	public String updateAnswerPage(@RequestParam("no") int no, 
-								   @RequestParam("originPw") String pw,
-								   Model model) throws Exception {
-		
-		AnswerVO answerVO = boardService.selectAnswerInfo(no);
-		List<FileVO> fileVO = boardService.selectAnswerFilesInfo(no);
-		Boolean isPwCorrect = passwordEncoder.matches(pw, answerVO.getPassword());
-		
-		if (isPwCorrect) {
-			model.addAttribute("answerInfo", answerVO);
-			model.addAttribute("fileInfo", fileVO);
-			
-			return "answerUpdate";
-		} else {
-			model.addAttribute("answerInfo", answerVO);
-			model.addAttribute("fileInfo", fileVO);
-	        model.addAttribute("errorMsg", "비밀번호를 확인하세요.");
-	        
-	        return "answerInfo";
-		}
-	}
-	
-	// 답변글 수정 기능
-	@RequestMapping(value = "/answerUpdate.do", method = RequestMethod.POST)
-	public String updateAnswer(AnswerVO vo,
-	                           @RequestParam("answerNo") int answerNo,
-	                           @RequestParam("originPw") String pw,
-	                           @RequestParam(value = "multiFile", required = false) List<MultipartFile> multipartFiles,
-	                           @RequestParam(value = "deletedFileNo", required = false) List<Integer> deleteNo,
-	                           Model model) throws Exception {
-
-	    boolean isUpdated = boardService.updateAnswerWithFiles(vo, answerNo, pw, multipartFiles, deleteNo);
-		List<FileVO> fileVO = boardService.selectAnswerFilesInfo(answerNo);
-
-	    if (!isUpdated) {
-	    	model.addAttribute("answerInfo", vo);
-			model.addAttribute("fileInfo", fileVO);
-	        model.addAttribute("errorMsg", "비밀번호가 틀렸습니다.");
-	        
-	        return "answerUpdate";  // 비밀번호가 틀렸을 때 머무를 페이지
-	    }
-
-	    return "redirect:boardList.do";
-	}	
-	
-	// 답변글 삭제 기능
-	@RequestMapping(value = "/answerDelete.do")
-	public String deleteAnswer(@RequestParam("no") int answerNo,
-							   @RequestParam("originPw") String pw,
-							   Model model
-							   ) throws Exception {
-		
-		AnswerVO answerVO = boardService.selectAnswerInfo(answerNo);
-		List<FileVO> fileVO = boardService.selectAnswerFilesInfo(answerNo);
-		Boolean isPwCorrect = passwordEncoder.matches(pw, answerVO.getPassword());
-		
-		if (isPwCorrect) {
-			boardService.deleteAnswer(answerNo);
-			
-			return "redirect:boardList.do";
-		} else {
-			model.addAttribute("answerInfo", answerVO);
-			model.addAttribute("fileInfo", fileVO);
-	        model.addAttribute("errorMsg", "비밀번호를 확인하세요.");
-	        
-	        return "answerInfo";
-		}
-	}
-	
+	/* 
+	 * 
+	 * 공통
+	 *  
+	 *  */ 
 	// 파일 다운로드
 	@RequestMapping(value = "/fileDownload.do")
 	public void fileDownload(HttpServletRequest req, HttpServletResponse res) throws Exception {
@@ -308,5 +205,29 @@ public class BoardController {
 	    String extendedName = req.getParameter("extendedName"); // upload할 때 변경된 파일 이름
 	    
 	    boardService.downloadFiles(extendedName, res);
+	}
+	
+
+	// 글 삭제 기능
+	@RequestMapping(value = "/boardDelete.do")
+	public String deleteBoard(@RequestParam("id") int id,
+							  @RequestParam("originPw") String pw,
+							  Model model) throws Exception {
+		
+		BoardsVO boardsVO = boardService.selectBoardInfo(id);
+		List<FileVO> fileVO = boardService.selectFilesInfo(id);
+		Boolean isPwCorrect = passwordEncoder.matches(pw, boardsVO.getPassword());
+		
+		if (isPwCorrect) {
+			boardService.deletePost(id);
+			
+			return "redirect:boardList.do";
+		} else {
+			model.addAttribute("boardInfo", boardsVO);
+			model.addAttribute("fileInfo", fileVO);
+	        model.addAttribute("errorMsg", "비밀번호를 확인하세요.");
+	        
+	        return "boardInfo";
+		}
 	}
 }

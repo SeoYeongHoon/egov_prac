@@ -14,18 +14,6 @@
 		document.boardInfoForm.action = "<c:url value='fileDownload.do?extendedName=" + exName + "' />";
 		document.boardInfoForm.submit();
 	}
-
-	// 수정 기능
-	/* function updateFormBtn() {
-		document.boardInfoForm.action = "<c:url value='boardUpdatePage.do' />";
-		document.boardInfoForm.submit();
-	} */
-	
-	// 삭제 기능
-	/* function deleteFormBtn(pw) {
-		document.boardInfoForm.action = "<c:url value='boardDelete.do' />";
-		document.boardInfoForm.submit();
-	} */
 	
 	// 답변 이동
 	function answerFormBtn(no) {
@@ -49,7 +37,7 @@
 <body>
 	<div id="boardInfo">
 		<form id="boardInfoForm" name="boardInfoForm" method="POST" encType="multipart/form-data">
-			<input type="hidden" name="no" value="${boardInfo.no }" />
+			<input type="hidden" name="id" value="${boardInfo.id }" />
 			<!-- 제목 -->
 			<h2 class="post-title">${boardInfo.title }</h2>
 			<!-- 작성자, 등록일, 조회수 -->
@@ -89,7 +77,9 @@
 					<input style="width: 250px; height: 35px; padding-left: 10px; border: 1px solid rgb(0, 0, 0, 0.1);" name="originPw" type="password" id="passwordCheck" placeholder="비밀번호" />
 					<button class="to-update-btn" type="button" onClick="updateFormBtn()">수정</button>
 					<button class="to-delete-btn" type="button" onClick="deleteFormBtn()">삭제</button>
-					<button class="to-answer-btn" type="button" onClick="answerFormBtn('<c:out value="${boardInfo.no }" />')">답변등록</button>
+					<c:if test="${boardInfo.type eq 'question' }">
+						<button class="to-answer-btn" type="button" onClick="answerFormBtn('<c:out value="${boardInfo.id }" />')">답변등록</button>
+					</c:if>
 				</div>
 			</div>
 		</form>
@@ -123,7 +113,7 @@
         }
         // 비밀번호를 POST 방식으로 전송하여 삭제 처리
         var form = document.getElementById('boardInfoForm');
-        form.action = 'boardDelete.do';  // 삭제 요청
+        form.action = 'boardDelete.do';  // 게시글 삭제 요청
         form.submit();
     }
 </script>

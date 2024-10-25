@@ -25,7 +25,7 @@
 	<div id="boardUpdate">
 		<form id="boardUpdateForm" name="boardUpdateForm" method="POST" encType="multipart/form-data">
 			<div class="writer-area">
-				<input type="hidden" name="no" value="${boardInfo.no }" />
+				<input type="hidden" name="id" value="${boardInfo.id }" />
 				<div class="writer-content">				
 					<label style="width: 165.4px;">작성자 <span style="color: red;">&#10004;</span></label>
 					<input class="info-input" type="text" name="writer" value="${boardInfo.writer }" required/>
@@ -86,15 +86,19 @@
 </body>
 <script>
 	let orgFiles = document.querySelectorAll('.filebox');
+	// 이미 있는 파일들 태그
 	
-	var fileNo = orgFiles.length;
-	var filesArr = new Array();
+	var fileNo = orgFiles.length; 
+	// 이미 있는 파일들의 길이(개수)를 추가할 파일의 첫 인덱스로 설정하기 위함. 
+	
+	var filesArr = []; // 파일들 담을 배열 선언
 	
 	for (var i = 0; i < orgFiles.length; i++) {
-		// 기존에 있는 파일들 배열에 넣기
+		// 기존에 있는 파일들을 먼저 배열에 넣기
 		filesArr.push(orgFiles[i]);
 	}
 	
+	// 그리고 파일 추가 함수
 	function addFile(obj) {
 	    let curFileCnt = obj.files.length;  // 현재 선택된 첨부파일 개수
 	    
@@ -117,21 +121,24 @@
 	}
 	
 	function deleteFile(num) {
-		
+		// 1. 파일 목록 div 삭제
+		// 2. 삭제한 파일의 fileNo를 value로 한 hidden type의 input 태그를 생성
+		// 3. 선택되어 있는 파일들을 배열로 변환 후, splice로 해당하는 파일을 제거
+		// 4. 배열을 forEach와 dataTransfer를 이용해서 file 요소 추가
+		// 5. 제거가 완료된 FileList 반환
 		if (confirm("삭제 하시겠습니까?")) {
-			let fileIdVal = document.querySelector("#file" + num).children.fileId.value;
-			console.log(fileIdVal);
-			
+			let fileIdVal = document.querySelector("#file" + num).children.fileId.value;		
+//			id가 file숫자 인 태그의 자식 요소 중 name이 fileId인 태그의 값 
 			
 			document.querySelector("#file" + num).remove(); // div 삭제
 			
-			let inputData = ``;
-			inputData += '<input type="hidden" name="deletedFileNo" value="' + fileIdVal + '"class="deletedFiles" />';
-			$('.file-update-list').append(inputData);
+			let htmlData = '';
+			htmlData += '<input type="hidden" name="deletedFileNo" value="' + fileIdVal + '"class="deletedFiles" />';
+			$('.file-update-list').append(htmlData);
 			
+			// input type="file"의 선택된 파일들의 목록에 접근 가능하기 위해 DataTransfer 객체 선언
 			const dataTransfer = new DataTransfer();
-			
-			
+						
 			let files = $('#file')[0].files; // 입력한 파일 변수에 할당
 			
 			let dataArray = Array.from(files); // 변수에 할당된 파일을 배열로 변환
@@ -145,8 +152,6 @@
 			
 			$('#file')[0].files = dataTransfer.files; // 제거 처리된 FileList를 돌려줌
 			
-		} else {
-			return;	
 		}
 	}
 	
