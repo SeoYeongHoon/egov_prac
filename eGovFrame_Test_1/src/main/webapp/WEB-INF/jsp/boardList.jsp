@@ -19,10 +19,12 @@ crossorigin="anonymous">
 <script>    
     function searchKeywordBtn() {
         let url = "boardList.do";
+		let searchKey = $('#searchKeyword').val();
         url += "?searchCondition=" + $('#searchCondition').val();
-        url += "&searchKeyword=" + $('#searchKeyword').val();
+        url += "&searchKeyword=" + searchKey;
+		
         location.href = url;
-        console.log(url);
+		$('#searchCondition').val() = searchKey;
     }
 </script>
 <style>
@@ -133,7 +135,7 @@ crossorigin="anonymous">
 		                        <td class="info-select" onClick="selectBoardInfo('<c:out value="${list.id}" />')">
 		                            <c:choose>
 		                                <c:when test="${list.type eq 'answer'}">
-		                                    ㄴ &nbsp;<c:out value="${list.title}" />
+		                                	ㄴ [답변] &nbsp;<span style="color: dodgerblue;"><c:out value="${list.title}" /></span>
 		                                </c:when>
 		                                <c:otherwise>
 		                                    <c:out value="${list.title}" />

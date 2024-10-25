@@ -10,14 +10,14 @@ public class FileVO {
 	private MultipartFile uploadFile;
 	private Long fileSize;
 	
-	private int no;
+	private int id;
 	private int answerNo;
 	
-	public int getNo() {
-		return no;
+	public int getId() {
+		return id;
 	}
-	public void setNo(int no) {
-		this.no = no;
+	public void setId(int id) {
+		this.id = id;
 	}
 	public int getFileNo() {
 		return fileNo;

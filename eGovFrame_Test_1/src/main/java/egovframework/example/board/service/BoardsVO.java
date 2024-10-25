@@ -11,7 +11,6 @@ public class BoardsVO {
     private String type;
     private int view;
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

@@ -8,13 +8,26 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
 <link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/board.css'/>"/>
 </head>
+<style>
+	.delete {
+		cursor: pointer;
+		display: inline-flex; 
+		align-items: center;
+		height: 100%;
+		padding: 5px;
+	}
+	.delete:hover {
+		background-color: lightgray;
+		border-radius: 5px;
+	}
+</style>
 <body>
 	<div id="boardAdd">
 		<div style="text-align: center; margin-bottom: 40px;">
 			<h3>[ ${boardInfo.title } ] 글에 대한 답변글</h3>
 		</div>
 		<form action="answerPost.do" id="answerPostForm" name="answerPostForm" method="POST" encType="multipart/form-data">
-			<input type="hidden" name="no" value="${boardInfo.no }" />
+			<input type="hidden" name="parentId" value="${boardInfo.id }" />
 			<div class="writer-area">
 				<div class="writer-content">				
 					<label style="width: 165.4px;" for="writer">작성자 <span style="color: red;">&#10004;</span></label>
@@ -77,25 +90,39 @@
 	}
 	
 	function deleteFile(num) {
-		document.querySelector("#file" + num).remove(); // div 삭제
 		
-		const dataTransfer = new DataTransfer();
+		if (confirm("삭제 하시겠습니까?")) {
+			
+		    // filesArr에서 해당 파일 삭제
+		    filesArr.splice(num, 1);
 		
-		let files = $('#file')[0].files; // 입력한 파일 변수에 할당
+		    // input type="file"의 선택된 파일들의 목록에 접근 가능하기 위해 DataTransfer 객체 선언
+		    const dataTransfer = new DataTransfer();
 		
-		let dataArray = Array.from(files); // 변수에 할당된 파일을 배열로 변환
+		    // 선택된 파일들을 dataTransfer로 처리(Array -> FileList)
+		    filesArr.forEach(function(file) {
+		        dataTransfer.items.add(file);
+		    });
 		
-		dataArray.splice(num, 1); // 해당하는 index의 파일을 배열에서 제거
-		console.log("파일 제거 후: ", dataArray[num]);
+		    // input의 FileList에 dataTransfer의 파일들을 넣음
+		    $('#file')[0].files = dataTransfer.files;
 		
-		dataArray.forEach(function(file) {
-			dataTransfer.items.add(file);
-		});
-		
-		$('#file')[0].files = dataTransfer.files; // 제거 처리된 FileList를 돌려줌
-		
-		console.log("제거 후 파일들: ", files);
-		
+		    // 화면에서 파일 리스트 업데이트
+		    $('.file-add-list').empty(); // 기존 리스트 초기화
+		    fileNo = 0; // 번호 초기화
+		    
+		    // 초기화 된 후 목록 생성
+		    filesArr.forEach(function(file) {
+		    	let htmlData = '';
+		        htmlData += '<div id="file' + fileNo + '" class="filebox" style="height:35px;">';
+		        htmlData += '<a class="delete" onclick="deleteFile(' + fileNo + ');"><img class="remove-btn" src="<c:url value='/images/egovframework/board/removebtn.png'/>"</a>';
+		        htmlData += '<p style="margin-left: 10px;" class="name">' + file.name + '</p>';
+		        htmlData += '</div>';
+		        
+		        $('.file-add-list').append(htmlData);
+		        fileNo++;
+		    });
+		}
 	}
 </script>
 </html>
